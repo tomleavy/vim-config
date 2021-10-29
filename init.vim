@@ -2,6 +2,7 @@ set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
 
 autocmd Filetype typescript setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 autocmd Filetype javascript setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+autocmd Filetype json setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 set number
 set termguicolors
@@ -454,3 +455,7 @@ lualine.setup {
   extensions = {'fugitive'}
 }
 EOF
+
+if has('nvim')
+  autocmd BufRead Cargo.toml call crates#toggle()
+endif
