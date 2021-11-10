@@ -38,8 +38,8 @@ saga.init_lsp_saga {
 }
 
 lsp_function_cfg = {
-    use_lspsaga = true,
     floating_window = true,
+    doc_lines = 0,
     floating_window_above_cur_line = false,
 }
 
@@ -100,7 +100,9 @@ cmp.setup{
   -- Installed sources
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'nvim_buffer'},
+    { name = 'vsnip' },
+    { name = 'path' },
+    { name = 'buffer'},
   },
 }
 
@@ -361,7 +363,6 @@ require'nvim-treesitter.configs'.setup {
     "php",
     "json",
     "yaml",
-    "swift",
     "html",
     "scss",
     "rust",
