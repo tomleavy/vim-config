@@ -17,6 +17,7 @@ let g:tokyonight_style = "night"
 colorscheme tokyonight
 
 set completeopt=menu,menuone,noselect
+set shortmess+=c
 
 lua << EOF
 require("bufferline").setup{}
@@ -239,7 +240,6 @@ buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 
 local on_attach = function(client, bufnr)
     require "lsp_signature".on_attach()
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
     format_on_save(client, bufnr)
 end
 

@@ -10,7 +10,6 @@ Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
 Plug 'mfussenegger/nvim-dap'
-Plug 'alx741/vim-rustfmt'
 Plug 'windwp/nvim-autopairs'
 Plug 'simrat39/rust-tools.nvim'
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
