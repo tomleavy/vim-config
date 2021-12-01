@@ -38,6 +38,7 @@ saga.init_lsp_saga {
   border_style = "round",
 }
 
+
 lsp_function_cfg = {
     floating_window = true,
     doc_lines = 0,
@@ -392,6 +393,9 @@ nnoremap <silent>ga :Lspsaga code_action<CR>
 
 " Vertical Split
 nnoremap <silent> vs :vsp<CR>
+
+" Line diagnostics
+nnoremap <silent>gd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
 
 " Telescope Bindings
 nnoremap <silent> ff <cmd>Telescope find_files<cr>
