@@ -19,12 +19,14 @@ colorscheme tokyonight
 set completeopt=menu,menuone,noselect
 set shortmess+=c
 
+
 lua << EOF
 require("bufferline").setup{}
 EOF
 
 nnoremap <silent> <C-]> :BufferLineCycleNext<CR>
 nnoremap <silent> <C-[> :BufferLineCyclePrev<CR>
+nnoremap gt <cmd>TroubleToggle workspace_diagnostics<cr>
 
 lua << EOF
 
@@ -140,17 +142,6 @@ nvim_lsp.tsserver.setup {
 
 nvim_lsp.diagnosticls.setup {}
 
--- CMake
-nvim_lsp.cmake.setup{
-    capabilities = capabilities
-}
--- ccls
-nvim_lsp.ccls.setup {
-    capabilities = capabilities
-}
-
-
-
 -- javascript linter
 require("formatter").setup(
   {
@@ -244,15 +235,6 @@ local on_attach = function(client, bufnr)
     format_on_save(client, bufnr)
 end
 
--- CMake
-nvim_lsp.cmake.setup {
-  on_attach = on_attach
-}
--- ccls
-nvim_lsp.ccls.setup {
-  on_attach = on_attach
-}
-
 local opts = {
     tools = { -- rust-tools options
         autoSetHints = true,
@@ -291,7 +273,7 @@ require('rust-tools.runnables').runnables()
 
 nvim_lsp.diagnosticls.setup {
   on_attach = on_attach,
-  filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'markdown', 'pandoc' },
+  filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'pandoc' },
   init_options = {
     linters = {
       eslint = {
@@ -342,7 +324,6 @@ nvim_lsp.diagnosticls.setup {
       typescript = 'eslint_d',
       typescriptreact = 'eslint_d',
       json = 'prettier',
-      markdown = 'prettier',
     }
   }
 }
@@ -371,7 +352,11 @@ require'nvim-treesitter.configs'.setup {
 }
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
+
+require('spellsitter').setup()
 EOF
+
+nnoremap <silent>gs z=
 
 " Hover Doc
 nnoremap <silent>K :Lspsaga hover_doc<CR>
@@ -404,7 +389,7 @@ nnoremap <silent> ;; <cmd>Telescope buffers<cr>
 nnoremap <silent> \\ <cmd>Telescope help_tags<cr>
 
 lua << EOF
-require('telescope').setup{ defaults = { file_ignore_patterns = {"node_modules", "build", "target"}, }, }
+require('telescope').setup{ defaults = { file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"}, }, }
 EOF
 
 "Floating Terminal
@@ -441,7 +426,7 @@ lualine.setup {
     lualine_b = {'branch'},
     lualine_c = {'filename'},
     lualine_x = {
-      { 'diagnostics', sources = {"nvim_lsp"} },
+      { 'diagnostics', sources = {"nvim_diagnostic"} },
       'encoding',
       'filetype'
     },

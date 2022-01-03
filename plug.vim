@@ -1,6 +1,6 @@
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'neovim/nvim-lspconfig'
-Plug 'rinx/lspsaga.nvim'
+Plug 'tami5/lspsaga.nvim', { 'branch': 'nvim6.0' }
 Plug 'nvim-lua/popup.nvim'
 Plug 'windwp/nvim-autopairs'
 Plug 'nvim-lua/plenary.nvim'
@@ -10,7 +10,6 @@ Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
 Plug 'mfussenegger/nvim-dap'
-Plug 'windwp/nvim-autopairs'
 Plug 'simrat39/rust-tools.nvim'
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
@@ -25,5 +24,10 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/vim-vsnip'
 Plug 'ray-x/lsp_signature.nvim'
 Plug 'mhinz/vim-crates'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate', 'branch': '0.5-compat'}
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'folke/trouble.nvim'
+Plug 'lewis6991/spellsitter.nvim'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+Plug 'ggandor/lightspeed.nvim'
 call plug#end()
