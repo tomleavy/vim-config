@@ -377,7 +377,7 @@ nnoremap <silent>gr :Lspsaga rename<CR>
 nnoremap <silent>ga :Lspsaga code_action<CR>
 
 " Vertical Split
-nnoremap <silent> vs :vsp<CR>
+nnoremap <silent> <C-t> :vsp<CR>
 
 " Line diagnostics
 nnoremap <silent>gd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
