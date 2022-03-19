@@ -22,6 +22,7 @@ set spell
 
 lua << EOF
 require("bufferline").setup{}
+require('gitsigns').setup()
 EOF
 
 nnoremap <silent> <C-]> :BufferLineCycleNext<CR>

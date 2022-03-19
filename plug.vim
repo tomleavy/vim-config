@@ -30,4 +30,5 @@ Plug 'lewis6991/spellsitter.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'ggandor/lightspeed.nvim'
+Plug 'lewis6991/gitsigns.nvim'
 call plug#end()
