@@ -22,11 +22,11 @@ set spell
 
 lua << EOF
 require("bufferline").setup{}
-require('gitsigns').setup()
 EOF
 
 nnoremap <silent> <C-]> :BufferLineCycleNext<CR>
 nnoremap <silent> <C-[> :BufferLineCyclePrev<CR>
+nnoremap <silent> <esc> :BufferLineCyclePrev<CR>
 nnoremap gt <cmd>TroubleToggle workspace_diagnostics<cr>
 
 lua << EOF
@@ -81,6 +81,7 @@ end
 require('nvim-autopairs').setup{}
 
 local cmp = require'cmp'
+
 cmp.setup{
   snippet = {
       expand = function(args)
@@ -97,8 +98,16 @@ cmp.setup{
   mapping = {
     ['<Tab>'] = cmp.mapping.select_next_item(),
     ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<Down>'] = cmp.mapping.select_next_item(),
+    ['<Up>'] = cmp.mapping.select_prev_item(),
+    ['<esc>'] = {
+        c = function()
+            local cmp = require('cmp')
+            cmp.mapping.abort()
+            vim.cmd('stopinsert')
+        end
+    },
     ['<CR>'] = cmp.mapping.confirm({
-      behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     }),
   },
@@ -225,11 +234,8 @@ require("formatter").setup(
   }
 )
 
-local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
 -- Mappings.
 local opts = { noremap=true, silent=true }
-buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 
 local on_attach = function(client, bufnr)
     require "lsp_signature".on_attach()
@@ -241,9 +247,10 @@ local opts = {
         autoSetHints = true,
         hover_with_actions = true,
         inlay_hints = {
-            show_parameter_hints = false,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
+            show_parameter_hints = true,
+            only_current_line = false,
+            parameter_hints_prefix = "< ",
+            other_hints_prefix = "\194\187 ",
         },
     },
 
@@ -387,14 +394,18 @@ nnoremap <silent> <C-t> :vsp<CR>
 " Line diagnostics
 nnoremap <silent>gd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
 
+nnoremap <silent>go :SymbolsOutline<CR>
+
 " Telescope Bindings
 nnoremap <silent> ff <cmd>Telescope find_files<cr>
 nnoremap <silent> fg <cmd>Telescope live_grep<cr>
+nnoremap <silent> fd <cmd>Telescope current_buffer_fuzzy_find<cr>
 nnoremap <silent> ;; <cmd>Telescope buffers<cr>
 nnoremap <silent> \\ <cmd>Telescope help_tags<cr>
 
 lua << EOF
 require('telescope').setup{ defaults = { file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"}, }, }
+require('telescope').load_extension("ui-select")
 EOF
 
 "Floating Terminal

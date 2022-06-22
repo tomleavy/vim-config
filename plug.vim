@@ -1,6 +1,6 @@
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'neovim/nvim-lspconfig'
-Plug 'tami5/lspsaga.nvim', { 'branch': 'nvim6.0' }
+Plug 'tami5/lspsaga.nvim', { 'branch': 'main' }
 Plug 'nvim-lua/popup.nvim'
 Plug 'windwp/nvim-autopairs'
 Plug 'nvim-lua/plenary.nvim'
@@ -30,5 +30,5 @@ Plug 'lewis6991/spellsitter.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'ggandor/lightspeed.nvim'
-Plug 'lewis6991/gitsigns.nvim'
+Plug 'nvim-telescope/telescope-ui-select.nvim'
 call plug#end()
