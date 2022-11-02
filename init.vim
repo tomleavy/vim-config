@@ -13,8 +13,7 @@ source ~/.config/nvim/plug.vim
 syntax on
 set t_Co=256
 set cursorline
-let g:tokyonight_style = "night"
-colorscheme tokyonight
+colorscheme tokyonight-night
 
 set completeopt=menu,menuone,noselect
 set shortmess+=c
@@ -60,22 +59,6 @@ local eslint = {
   formatCommand = "eslint_d --fix-to-stdout --stdin --stdin-filename=${INPUT}",
   formatStdin = true
 }
-
-vim.api.nvim_exec([[
-augroup FormatAutogroup
-  autocmd!
-  autocmd BufWritePost *.ts,*.js,*.lua FormatWrite
-augroup END
-]], true)
-
-local function format_on_save(client, bufnr)
-  if client.resolved_capabilities.document_formatting then
-    vim.api.nvim_command [[augroup Format]]
-    vim.api.nvim_command [[autocmd! * <buffer>]]
-    vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
-    vim.api.nvim_command [[augroup END]]
-  end
-end
 
 -- Completion
 require('nvim-autopairs').setup{}
@@ -145,8 +128,6 @@ nvim_lsp.tsserver.setup {
           client.config.flags.allow_incremental_sync = true
         end
         client.resolved_capabilities.document_formatting = false
-    
-    format_on_save(client, bufnr)
     end
 }
 
@@ -239,13 +220,11 @@ local opts = { noremap=true, silent=true }
 
 local on_attach = function(client, bufnr)
     require "lsp_signature".on_attach()
-    format_on_save(client, bufnr)
 end
 
 local opts = {
     tools = { -- rust-tools options
         autoSetHints = true,
-        hover_with_actions = true,
         inlay_hints = {
             show_parameter_hints = true,
             only_current_line = false,
@@ -336,6 +315,8 @@ nvim_lsp.diagnosticls.setup {
   }
 }
 
+require('leap').add_default_mappings()
+
 -- Treesitter
 require'nvim-treesitter.configs'.setup {
   highlight = {
@@ -403,6 +384,8 @@ nnoremap <silent> fd <cmd>Telescope current_buffer_fuzzy_find<cr>
 nnoremap <silent> ;; <cmd>Telescope buffers<cr>
 nnoremap <silent> \\ <cmd>Telescope help_tags<cr>
 
+set signcolumn=yes
+
 lua << EOF
 require('telescope').setup{ defaults = { file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"}, }, }
 require('telescope').load_extension("ui-select")
@@ -460,8 +443,32 @@ lualine.setup {
   tabline = {},
   extensions = {'fugitive'}
 }
+
+local dap = require("dap")
+dap.defaults.fallback.terminal_win_cmd = "50vsplit new"
+require("dapui").setup()
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.rs",
+  callback = function()
+   vim.lsp.buf.formatting_seq_sync()
+  end,
+  group = format_sync_grp,
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.ts",
+  callback = function()
+   vim.lsp.buf.formatting_seq_sync()
+  end,
+  group = format_sync_grp,
+})
+
+
 EOF
 
 if has('nvim')
   autocmd BufRead Cargo.toml call crates#toggle()
 endif
+
+

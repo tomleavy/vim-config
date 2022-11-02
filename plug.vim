@@ -29,6 +29,7 @@ Plug 'folke/trouble.nvim'
 Plug 'lewis6991/spellsitter.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
-Plug 'ggandor/lightspeed.nvim'
 Plug 'nvim-telescope/telescope-ui-select.nvim'
+Plug 'rcarriga/nvim-dap-ui'
+Plug 'ggandor/leap.nvim'
 call plug#end()
