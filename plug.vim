@@ -32,4 +32,6 @@ Plug 'tpope/vim-repeat'
 Plug 'nvim-telescope/telescope-ui-select.nvim'
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'ggandor/leap.nvim'
+Plug 'jose-elias-alvarez/null-ls.nvim'
+Plug 'MunifTanjim/prettier.nvim'
 call plug#end()

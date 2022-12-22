@@ -119,105 +119,75 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- TypeScript
+local lsp_formatting = function(bufnr)
+    vim.lsp.buf.format({
+        filter = function(client)
+            -- apply whatever logic you want (in this example, we'll only use null-ls)
+            return client.name == "null-ls"
+        end,
+        bufnr = bufnr,
+    })
+end
+
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+local on_attach_ts = function(client, bufnr)
+    require "lsp_signature".on_attach()
+
+    if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+            group = augroup,
+            buffer = bufnr,
+            callback = function()
+                lsp_formatting(bufnr)
+            end,
+        })
+    end
+end
+
+-- Prettier
+
+
+local prettier = require("prettier")
+
+prettier.setup {
+  bin = 'prettierd',
+  filetypes = {
+    "css",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "scss",
+    "less"
+  }
+}
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+  sources = {
+    null_ls.builtins.diagnostics.eslint_d.with({
+      diagnostics_format = '[eslint] #{m}\n(#{c})'
+    }),
+    null_ls.builtins.diagnostics.fish,
+    null_ls.builtins.formatting.prettier
+  }
+})
+
 nvim_lsp.tsserver.setup {
     capabilities = capabilities,
-    on_attach = function(client, bufnr)
-    require "lsp_signature".on_attach()
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    if client.config.flags then
-          client.config.flags.allow_incremental_sync = true
-        end
-        client.resolved_capabilities.document_formatting = false
-    end
+    on_attach = on_attach_ts 
 }
 
 nvim_lsp.diagnosticls.setup {}
 
--- javascript linter
-require("formatter").setup(
-  {
-    logging = true,
-    filetype = {
-      typescriptreact = {
-        -- prettier
-        function()
-          return {
-            exe = "prettier",
-            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)},
-            stdin = true
-          }
-        end
-      },
-      typescript = {
-        -- prettier
-        function()
-          return {
-            exe = "prettier",
-            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)},
-            stdin = true
-          }
-        end
-        -- linter
-        -- function()
-        --   return {
-        --     exe = "eslint",
-        --     args = {
-        --       "--stdin-filename",
-        --       vim.api.nvim_buf_get_name(0),
-        --       "--fix",
-        --       "--cache"
-        --     },
-        --     stdin = false
-        --   }
-        -- end
-      },
-      javascript = {
-        -- prettier
-        function()
-          return {
-            exe = "prettier",
-            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)},
-            stdin = true
-          }
-        end
-      },
-      javascriptreact = {
-        -- prettier
-        function()
-          return {
-            exe = "prettier",
-            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)},
-            stdin = true
-          }
-        end
-      },
-      json = {
-        -- prettier
-        function()
-          return {
-            exe = "prettier",
-            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0)},
-            stdin = true
-          }
-        end
-      },
-      lua = {
-        -- luafmt
-        function()
-          return {
-            exe = "luafmt",
-            args = {"--indent-count", 2, "--stdin"},
-            stdin = true
-          }
-        end
-      }
-    }
-  }
-)
-
 -- Mappings.
 local opts = { noremap=true, silent=true }
 
+-- RUST
 local on_attach = function(client, bufnr)
     require "lsp_signature".on_attach()
 end
