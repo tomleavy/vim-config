@@ -29,25 +29,7 @@ nnoremap <silent> <esc> :BufferLineCyclePrev<CR>
 nnoremap gt <cmd>TroubleToggle workspace_diagnostics<cr>
 
 lua << EOF
-
--- Saga
-local saga = require 'lspsaga'
-saga.init_lsp_saga {
-  error_sign = '',
-  warn_sign = '',
-  hint_sign = '',
-  infor_sign = '',
-  border_style = "round",
-}
-
-
-lsp_function_cfg = {
-    floating_window = true,
-    doc_lines = 0,
-    floating_window_above_cur_line = false,
-}
-
-require'lsp_signature'.setup(lsp_function_cfg)
+require('gitsigns').setup()
 
 local nvim_lsp = require('lspconfig')
 
@@ -97,6 +79,8 @@ cmp.setup{
   -- Installed sources
   sources = {
     { name = 'nvim_lsp' },
+    { name = 'nvim_lsp_signature_help' },
+    { name = 'nvim_lua' },
     { name = 'vsnip' },
     { name = 'path' },
     { name = 'buffer'},
@@ -182,14 +166,13 @@ nvim_lsp.tsserver.setup {
     on_attach = on_attach_ts 
 }
 
-nvim_lsp.diagnosticls.setup {}
+--nvim_lsp.diagnosticls.setup {}
 
 -- Mappings.
 local opts = { noremap=true, silent=true }
 
 -- RUST
 local on_attach = function(client, bufnr)
-    require "lsp_signature".on_attach()
 end
 
 local opts = {
@@ -213,6 +196,9 @@ local opts = {
             -- to enable rust-analyzer settings visit:
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
             ["rust-analyzer"] = {
+                cargo = {
+                    features = "all",
+                },
                 -- enable clippy on save
                 checkOnSave = {
                     command = "clippy"
@@ -343,9 +329,9 @@ nnoremap <silent>ga :Lspsaga code_action<CR>
 nnoremap <silent> <C-t> :vsp<CR>
 
 " Line diagnostics
-nnoremap <silent>gd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
+nnoremap <silent>gd <cmd>Lspsaga show_line_diagnostics<CR>
 
-nnoremap <silent>go :SymbolsOutline<CR>
+nnoremap <silent>go <cmd>Lspsaga outline<CR>
 
 " Telescope Bindings
 nnoremap <silent> ff <cmd>Telescope find_files<cr>
@@ -434,6 +420,12 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   group = format_sync_grp,
 })
 
+-- Saga
+require('lspsaga').setup({
+    lightbulb = {
+        enable = false
+    }
+})
 
 EOF
 
