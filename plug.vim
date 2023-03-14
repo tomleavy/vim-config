@@ -27,7 +27,6 @@ Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 Plug 'mhinz/vim-crates'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'folke/trouble.nvim'
-Plug 'lewis6991/spellsitter.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'nvim-telescope/telescope-ui-select.nvim'

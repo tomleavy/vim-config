@@ -199,9 +199,10 @@ local opts = {
                 cargo = {
                     features = "all",
                 },
-                -- enable clippy on save
-                checkOnSave = {
-                    command = "clippy"
+                check = {
+                    features = "all",
+                    command = "clippy",
+                    extraArgs = "--all-targets",
                 },
             }
         }
@@ -293,14 +294,12 @@ require'nvim-treesitter.configs'.setup {
     "html",
     "scss",
     "rust",
+    "markdown"
   },
 }
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 
-require('spellsitter').setup {
-    enable = true
-}
 EOF
 
 imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
