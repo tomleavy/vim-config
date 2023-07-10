@@ -1,6 +1,6 @@
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'neovim/nvim-lspconfig'
-Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
+Plug 'nvimdev/lspsaga.nvim', { 'commit': '4f075452c466df263e69ae142f6659dcf9324bf6' }
 Plug 'nvim-lua/popup.nvim'
 Plug 'windwp/nvim-autopairs'
 Plug 'nvim-lua/plenary.nvim'
