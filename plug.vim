@@ -35,4 +35,5 @@ Plug 'ggandor/leap.nvim'
 Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
 Plug 'lewis6991/gitsigns.nvim'
+Plug 'j-hui/fidget.nvim'
 call plug#end()

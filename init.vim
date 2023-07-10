@@ -30,6 +30,7 @@ nnoremap gt <cmd>TroubleToggle workspace_diagnostics<cr>
 
 lua << EOF
 require('gitsigns').setup()
+require"fidget".setup{}
 
 local nvim_lsp = require('lspconfig')
 
@@ -197,12 +198,19 @@ local opts = {
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
             ["rust-analyzer"] = {
                 cargo = {
+                    --noDefaultFeatures = true,
+                    -- extraArgs = "--lib",
+                    -- invocationLocation = "root"
                     features = "all",
+                    -- unsetTest = { "core", "aws-mls", "aws-mls-core", "aws-mls-codec" },
+                    -- target = "thumbv7em-none-eabi"
                 },
                 check = {
-                    features = "all",
+                    allTargets = true,
+                    --invocationLocation = "root",
+                    -- features = "all",
                     command = "clippy",
-                    extraArgs = "--all-targets",
+                    -- extraArgs = "--all-targets",
                 },
             }
         }
@@ -214,6 +222,8 @@ require('rust-tools').setup(opts)
 -- Command:
 -- RustRunnables
 require('rust-tools.runnables').runnables()
+
+require'lspconfig'.ccls.setup{}
 
 nvim_lsp.diagnosticls.setup {
   on_attach = on_attach,
@@ -342,7 +352,21 @@ nnoremap <silent> \\ <cmd>Telescope help_tags<cr>
 set signcolumn=yes
 
 lua << EOF
-require('telescope').setup{ defaults = { file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"}, }, }
+require('telescope').setup{ 
+    defaults = { 
+        file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"},
+        vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+        }
+    },
+}
+
 require('telescope').load_extension("ui-select")
 EOF
 
@@ -403,10 +427,12 @@ local dap = require("dap")
 dap.defaults.fallback.terminal_win_cmd = "50vsplit new"
 require("dapui").setup()
 
+local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
+
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*.rs",
   callback = function()
-   vim.lsp.buf.formatting_seq_sync()
+      vim.lsp.buf.format({ timeout_ms = 500 })
   end,
   group = format_sync_grp,
 })
@@ -424,9 +450,35 @@ require('lspsaga').setup({
     lightbulb = {
         enable = false
     }
+-- Swift
+require'lspconfig'.sourcekit.setup{}
+
+-- LSP Commands
+
+-- Use LspAttach autocommand to only map the following keys
+-- after the language server attaches to the current buffer
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    -- Enable completion triggered by <c-x><c-o>
+    --vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+    -- Buffer local mappings.
+    -- See `:help vim.lsp.*` for documentation on any of the below functions
+    local opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gH', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gh', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.diagnostic.show_line_diagnostics, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', 'ga', vim.lsp.buf.code_action, opts)
+  end,
 })
 
 EOF
+
+autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %"
 
 if has('nvim')
   autocmd BufRead Cargo.toml call crates#toggle()
