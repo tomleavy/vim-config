@@ -1,6 +1,5 @@
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'neovim/nvim-lspconfig'
-Plug 'nvimdev/lspsaga.nvim', { 'commit': '4f075452c466df263e69ae142f6659dcf9324bf6' }
 Plug 'nvim-lua/popup.nvim'
 Plug 'windwp/nvim-autopairs'
 Plug 'nvim-lua/plenary.nvim'
@@ -36,4 +35,6 @@ Plug 'jose-elias-alvarez/null-ls.nvim'
 Plug 'MunifTanjim/prettier.nvim'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'j-hui/fidget.nvim'
+Plug 'stevearc/dressing.nvim'
+Plug 'smjonas/inc-rename.nvim'
 call plug#end()

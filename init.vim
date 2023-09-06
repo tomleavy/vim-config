@@ -21,6 +21,7 @@ set spell
 
 lua << EOF
 require("bufferline").setup{}
+
 EOF
 
 nnoremap <silent> <C-]> :BufferLineCycleNext<CR>
@@ -198,7 +199,7 @@ local opts = {
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
             ["rust-analyzer"] = {
                 cargo = {
-                    --noDefaultFeatures = true,
+                    -- noDefaultFeatures = true,
                     -- extraArgs = "--lib",
                     -- invocationLocation = "root"
                     features = "all",
@@ -208,7 +209,7 @@ local opts = {
                 check = {
                     allTargets = true,
                     --invocationLocation = "root",
-                    -- features = "all",
+                    features = "all",
                     command = "clippy",
                     -- extraArgs = "--all-targets",
                 },
@@ -317,42 +318,57 @@ imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab
 nnoremap <silent>gs z=
 
 " Hover Doc
-nnoremap <silent>K :Lspsaga hover_doc<CR>
-
-" Signature Help
-inoremap <silent>gf <Cmd>Lspsaga signature_help<CR>
+"nnoremap <silent>K :Lspsaga hover_doc<CR>
+noremap <silent>K :lua vim.lsp.buf.hover()<CR>
 
 " LSP Find Usage
-nnoremap <silent>gh <Cmd>Lspsaga lsp_finder<CR>
+" nnoremap <silent>gh <Cmd>Lspsaga lsp_finder<CR>
+nnoremap <silent>gh :lua require('telescope.builtin').lsp_definitions({jump_type = "never"})<CR> 	
 
 " Rust run tests
 nnoremap <silent>gb :RustRunnables<CR>
 
-" LSP Rename
-nnoremap <silent>gr :Lspsaga rename<CR>
 
 " LSP Code Action
-nnoremap <silent>ga :Lspsaga code_action<CR>
+"nnoremap <silent>ga :Lspsaga code_action<CR>
+nnoremap <silent>ga :lua vim.lsp.buf.code_action()<CR>
 
 " Vertical Split
 nnoremap <silent> <C-t> :vsp<CR>
 
 " Line diagnostics
-nnoremap <silent>gd <cmd>Lspsaga show_line_diagnostics<CR>
-
-nnoremap <silent>go <cmd>Lspsaga outline<CR>
+nnoremap <silent>gd :lua vim.diagnostics.open_float()<CR>
 
 " Telescope Bindings
 nnoremap <silent> ff <cmd>Telescope find_files<cr>
 nnoremap <silent> fg <cmd>Telescope live_grep<cr>
 nnoremap <silent> fd <cmd>Telescope current_buffer_fuzzy_find<cr>
-nnoremap <silent> ;; <cmd>Telescope buffers<cr>
-nnoremap <silent> \\ <cmd>Telescope help_tags<cr>
 
 set signcolumn=yes
 
 lua << EOF
 require('telescope').setup{ 
+    extensions = {
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown {
+            -- even more opts
+          }
+
+          -- pseudo code / specification for writing custom displays, like the one
+          -- for "codeactions"
+          -- specific_opts = {
+          --   [kind] = {
+          --     make_indexed = function(items) -> indexed_items, width,
+          --     make_displayer = function(widths) -> displayer
+          --     make_display = function(displayer) -> function(e)
+          --     make_ordinal = function(e) -> string
+          --   },
+          --   -- for example to disable the custom builtin "codeactions" display
+          --      do the following
+          --   codeactions = false,
+          -- }
+        }
+    },
     defaults = { 
         file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"},
         vimgrep_arguments = {
@@ -367,7 +383,18 @@ require('telescope').setup{
     },
 }
 
+require("dressing").setup{}
+
+require("inc_rename").setup {
+    input_buffer_type = "dressing",
+}
+
 require('telescope').load_extension("ui-select")
+
+vim.keymap.set("n", "gr", function()
+  return ":IncRename " .. vim.fn.expand("<cword>")
+end, { expr = true })
+
 EOF
 
 "Floating Terminal
@@ -443,13 +470,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
    vim.lsp.buf.formatting_seq_sync()
   end,
   group = format_sync_grp,
-})
-
--- Saga
-require('lspsaga').setup({
-    lightbulb = {
-        enable = false
-    }
 })
 
 -- Swift
