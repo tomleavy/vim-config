@@ -194,19 +194,12 @@ local opts = {
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
             ["rust-analyzer"] = {
                 cargo = {
-                    -- noDefaultFeatures = true,
-                    -- extraArgs = "--lib",
-                    -- invocationLocation = "root"
                     features = "all",
-                    -- unsetTest = { "core", "aws-mls", "aws-mls-core", "aws-mls-codec" },
-                    -- target = "thumbv7em-none-eabi"
                 },
                 check = {
                     allTargets = true,
-                    --invocationLocation = "root",
                     features = "all",
                     command = "clippy",
-                    -- extraArgs = "--all-targets",
                 },
             }
         }
