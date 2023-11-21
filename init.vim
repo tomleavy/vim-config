@@ -104,37 +104,7 @@ require("cmp").setup({
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
--- TypeScript
-local lsp_formatting = function(bufnr)
-    vim.lsp.buf.format({
-        filter = function(client)
-            -- apply whatever logic you want (in this example, we'll only use null-ls)
-            return client.name == "null-ls"
-        end,
-        bufnr = bufnr,
-    })
-end
-
-local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
-local on_attach_ts = function(client, bufnr)
-    require "lsp_signature".on_attach()
-
-    if client.supports_method("textDocument/formatting") then
-        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-        vim.api.nvim_create_autocmd("BufWritePre", {
-            group = augroup,
-            buffer = bufnr,
-            callback = function()
-                lsp_formatting(bufnr)
-            end,
-        })
-    end
-end
-
 -- Prettier
-
-
 local prettier = require("prettier")
 
 prettier.setup {
@@ -153,7 +123,35 @@ prettier.setup {
 
 local null_ls = require("null-ls")
 
+local group = vim.api.nvim_create_augroup("lsp_format_on_save", { clear = false })
+local event = "BufWritePre" -- or "BufWritePost"
+local async = event == "BufWritePost"
+
 null_ls.setup({
+  on_attach = function(client, bufnr)
+    if client.supports_method("textDocument/formatting") then
+      vim.keymap.set("n", "<Leader>f", function()
+        vim.lsp.buf.format({ bufnr = vim.api.nvim_get_current_buf() })
+      end, { buffer = bufnr, desc = "[lsp] format" })
+
+      -- format on save
+      vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
+      vim.api.nvim_create_autocmd(event, {
+        buffer = bufnr,
+        group = group,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = bufnr, async = async })
+        end,
+        desc = "[lsp] format on save",
+      })
+    end
+
+    if client.supports_method("textDocument/rangeFormatting") then
+      vim.keymap.set("x", "<Leader>f", function()
+        vim.lsp.buf.format({ bufnr = vim.api.nvim_get_current_buf() })
+      end, { buffer = bufnr, desc = "[lsp] format" })
+    end
+  end,
   sources = {
     null_ls.builtins.diagnostics.eslint_d.with({
       diagnostics_format = '[eslint] #{m}\n(#{c})'
@@ -165,10 +163,7 @@ null_ls.setup({
 
 nvim_lsp.tsserver.setup {
     capabilities = capabilities,
-    on_attach = on_attach_ts 
 }
-
---nvim_lsp.diagnosticls.setup {}
 
 -- Mappings.
 local opts = { noremap=true, silent=true }
@@ -226,63 +221,6 @@ require('rust-tools.runnables').runnables()
 
 require'lspconfig'.ccls.setup{}
 
-nvim_lsp.diagnosticls.setup {
-  on_attach = on_attach,
-  filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'pandoc' },
-  init_options = {
-    linters = {
-      eslint = {
-        command = 'eslint_d',
-        rootPatterns = { '.git' },
-        debounce = 100,
-        args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
-        sourceName = 'eslint_d',
-        parseJson = {
-          errorsRoot = '[0].messages',
-          line = 'line',
-          column = 'column',
-          endLine = 'endLine',
-          endColumn = 'endColumn',
-          message = '[eslint] ${message} [${ruleId}]',
-          security = 'severity'
-        },
-        securities = {
-          [2] = 'error',
-          [1] = 'warning'
-        }
-      },
-    },
-    filetypes = {
-      javascript = 'eslint',
-      javascriptreact = 'eslint',
-      typescript = 'eslint',
-      typescriptreact = 'eslint',
-    },
-    formatters = {
-      eslint_d = {
-        command = 'eslint_d',
-        args = { '--stdin', '--stdin-filename', '%filename', '--fix-to-stdout' },
-        rootPatterns = { '.git' },
-      },
-      prettier = {
-        command = 'prettier',
-        args = { '--stdin-filepath', '%filename' }
-      }
-    },
-    formatFiletypes = {
-      css = 'prettier',
-      javascript = 'eslint_d',
-      javascriptreact = 'eslint_d',
-      json = 'prettier',
-      scss = 'prettier',
-      less = 'prettier',
-      typescript = 'eslint_d',
-      typescriptreact = 'eslint_d',
-      json = 'prettier',
-    }
-  }
-}
-
 require('leap').add_default_mappings()
 
 -- Treesitter
@@ -337,7 +275,7 @@ nnoremap <silent>ga :lua vim.lsp.buf.code_action()<CR>
 nnoremap <silent> <C-t> :vsp<CR>
 
 " Line diagnostics
-nnoremap <silent>gd :lua vim.diagnostics.open_float()<CR>
+nnoremap <silent>gd :lua vim.diagnostic.open_float()<CR>
 
 " Telescope Bindings
 nnoremap <silent> ff <cmd>Telescope find_files<cr>
@@ -464,13 +402,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   group = format_sync_grp,
 })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.ts",
-  callback = function()
-   vim.lsp.buf.formatting_seq_sync()
-  end,
-  group = format_sync_grp,
-})
 
 -- Swift
 require'lspconfig'.sourcekit.setup{}
