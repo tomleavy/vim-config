@@ -399,7 +399,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- Swift
 require'lspconfig'.sourcekit.setup{}
 
-
 EOF
 
 autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %"

@@ -37,4 +37,5 @@ Plug 'lewis6991/gitsigns.nvim'
 Plug 'j-hui/fidget.nvim'
 Plug 'stevearc/dressing.nvim'
 Plug 'smjonas/inc-rename.nvim'
+Plug 'mfussenegger/nvim-jdtls'
 call plug#end()
