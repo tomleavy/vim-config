@@ -1,3 +1,10 @@
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync
+endif
+
 set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
 
 autocmd Filetype typescript setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
@@ -6,6 +13,7 @@ autocmd Filetype json setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 sm
 
 set number
 set termguicolors
+
 
 " Plugins
 source ~/.config/nvim/plug.vim
@@ -104,65 +112,27 @@ require("cmp").setup({
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
--- Prettier
-local prettier = require("prettier")
-
-prettier.setup {
-  bin = 'prettierd',
-  filetypes = {
-    "css",
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "json",
-    "scss",
-    "less"
-  }
-}
-
-local null_ls = require("null-ls")
-
-local group = vim.api.nvim_create_augroup("lsp_format_on_save", { clear = false })
-local event = "BufWritePre" -- or "BufWritePost"
-local async = event == "BufWritePost"
-
-null_ls.setup({
-  on_attach = function(client, bufnr)
-    if client.supports_method("textDocument/formatting") then
-      vim.keymap.set("n", "<Leader>f", function()
-        vim.lsp.buf.format({ bufnr = vim.api.nvim_get_current_buf() })
-      end, { buffer = bufnr, desc = "[lsp] format" })
-
-      -- format on save
-      vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
-      vim.api.nvim_create_autocmd(event, {
-        buffer = bufnr,
-        group = group,
-        callback = function()
-          vim.lsp.buf.format({ bufnr = bufnr, async = async })
-        end,
-        desc = "[lsp] format on save",
-      })
-    end
-
-    if client.supports_method("textDocument/rangeFormatting") then
-      vim.keymap.set("x", "<Leader>f", function()
-        vim.lsp.buf.format({ bufnr = vim.api.nvim_get_current_buf() })
-      end, { buffer = bufnr, desc = "[lsp] format" })
-    end
-  end,
-  sources = {
-    null_ls.builtins.diagnostics.eslint_d.with({
-      diagnostics_format = '[eslint] #{m}\n(#{c})'
-    }),
-    null_ls.builtins.diagnostics.fish,
-    null_ls.builtins.formatting.prettier
-  }
-})
-
+-- Typescript
 nvim_lsp.tsserver.setup {
     capabilities = capabilities,
+}
+
+nvim_lsp.eslint.setup {
+    capabilities = capabilities,
+    on_attach = function(client, bufnr)
+        client.server_capabilities.documentFormattingProvider = true
+
+        if client.server_capabilities.documentFormattingProvider then
+            local au_lsp = vim.api.nvim_create_augroup("eslint_lsp", { clear = true })
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                pattern = "*",
+                callback = function()
+                    vim.lsp.buf.format({ async = true })
+                end,
+            group = au_lsp,
+        })
+        end
+  end,
 }
 
 -- Mappings.
@@ -398,6 +368,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 -- Swift
 require'lspconfig'.sourcekit.setup{}
+
+-- Remote Development
+require("remote-nvim").setup({
+  -- Add your other configuration parameters as usual
+})
 
 EOF
 
