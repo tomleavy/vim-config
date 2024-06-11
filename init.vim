@@ -15,17 +15,23 @@ set number
 set termguicolors
 
 
+
 " Plugins
 source ~/.config/nvim/plug.vim
+
+
+colorscheme tokyonight-night
 
 syntax on
 set t_Co=256
 set cursorline
-colorscheme tokyonight-night
 
 set completeopt=menu,menuone,noselect
 set shortmess+=c
 set spell
+
+let g:floaterm_height = 0.95
+let g:floaterm_width = 0.75
 
 lua << EOF
 require("bufferline").setup{}
@@ -164,6 +170,7 @@ local opts = {
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
             ["rust-analyzer"] = {
                 cargo = {
+                    -- target = "i686-linux-android"
                     features = "all",
                 },
                 check = {
@@ -351,10 +358,6 @@ lualine.setup {
   extensions = {'fugitive'}
 }
 
-local dap = require("dap")
-dap.defaults.fallback.terminal_win_cmd = "50vsplit new"
-require("dapui").setup()
-
 local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
 
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -374,6 +377,24 @@ require("remote-nvim").setup({
   -- Add your other configuration parameters as usual
 })
 
+-- LLM Autocomplete
+--[[
+require('llm').setup({
+    backend = "ollama",
+    model = "starcoder2",
+    url = "http://127.0.0.1:11434/api/generate",
+    enable_suggestions_on_startup = false,
+    debounce_ms = 5000,
+})
+--]]
+
+-- python
+local py_cap = vim.lsp.protocol.make_client_capabilities()
+py_cap = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+require'lspconfig'.pyright.setup {
+    capabilities = py_cap
+}
 EOF
 
 autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %"

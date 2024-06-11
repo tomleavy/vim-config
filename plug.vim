@@ -8,7 +8,6 @@ Plug 'hoob3rt/lualine.nvim'
 Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
-Plug 'mfussenegger/nvim-dap'
 Plug 'simrat39/rust-tools.nvim'
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
@@ -29,7 +28,6 @@ Plug 'folke/trouble.nvim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'nvim-telescope/telescope-ui-select.nvim'
-Plug 'rcarriga/nvim-dap-ui'
 Plug 'ggandor/leap.nvim'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'j-hui/fidget.nvim'
@@ -38,4 +36,7 @@ Plug 'smjonas/inc-rename.nvim'
 Plug 'mfussenegger/nvim-jdtls'
 Plug 'MunifTanjim/nui.nvim'
 Plug 'amitds1997/remote-nvim.nvim'
+Plug 'huggingface/llm.nvim'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
+Plug 'ray-x/starry.nvim'
 call plug#end()
