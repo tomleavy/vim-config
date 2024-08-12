@@ -61,22 +61,17 @@ local eslint = {
 }
 
 -- Completion
-require('nvim-autopairs').setup{}
+require('nvim-autopairs').setup{
+    enable_check_bracket_line = false
+}
 
 local cmp = require'cmp'
 
 cmp.setup{
   snippet = {
-      expand = function(args)
-        -- For `vsnip` user.
-        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` user.
-
-        -- For `luasnip` user.
-        -- require('luasnip').lsp_expand(args.body)
-
-        -- For `ultisnips` user.
-        -- vim.fn["UltiSnips#Anon"](args.body)
-      end,
+    expand = function(args)
+      vim.snippet.expand(args.body)
+    end,
   },
   mapping = {
     ['<Tab>'] = cmp.mapping.select_next_item(),
@@ -99,26 +94,20 @@ cmp.setup{
     { name = 'nvim_lsp' },
     { name = 'nvim_lsp_signature_help' },
     { name = 'nvim_lua' },
-    { name = 'vsnip' },
     { name = 'path' },
     { name = 'buffer'},
   },
 }
 
--- you need setup cmp first put this after cmp.setup()
-require("cmp").setup({
-  map_cr = true, --  map <CR> on insert mode
-  map_complete = true, -- it will auto insert `(` (map_char) after select function or method item
-  auto_select = true, -- automatically select the first item
-  insert = false, -- use insert confirm behavior instead of replace
-  map_char = { -- modifies the function or method delimiter by filetypes
-    all = '(',
-    tex = '{'
-  }
-})
+-- If you want insert `(` after select function or method item
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done()
+)
+
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 -- Typescript
 nvim_lsp.tsserver.setup {
@@ -193,8 +182,6 @@ require('rust-tools.runnables').runnables()
 
 require'lspconfig'.ccls.setup{}
 
-require('leap').add_default_mappings()
-
 -- Treesitter
 require'nvim-treesitter.configs'.setup {
   highlight = {
@@ -222,8 +209,6 @@ local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 
 EOF
-
-imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
 
 nnoremap <silent>gs z=
 
@@ -370,33 +355,15 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   group = format_sync_grp,
 })
 
-
 -- Swift
-require'lspconfig'.sourcekit.setup{}
-
--- Remote Development
-require("remote-nvim").setup({
-  -- Add your other configuration parameters as usual
-})
-
--- LLM Autocomplete
---[[
-require('llm').setup({
-    backend = "ollama",
-    model = "starcoder2",
-    url = "http://127.0.0.1:11434/api/generate",
-    enable_suggestions_on_startup = false,
-    debounce_ms = 5000,
-})
---]]
-
--- python
-local py_cap = vim.lsp.protocol.make_client_capabilities()
-py_cap = require('cmp_nvim_lsp').default_capabilities(capabilities)
+require'lspconfig'.sourcekit.setup{
+    capabilities = capabilities
+}
 
 require'lspconfig'.pyright.setup {
-    capabilities = py_cap
+    capabilities = capabilities
 }
+
 EOF
 
 autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %"
@@ -404,5 +371,3 @@ autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %
 if has('nvim')
   autocmd BufRead Cargo.toml call crates#toggle()
 endif
-
-
