@@ -41,11 +41,13 @@ EOF
 nnoremap <silent> <C-]> :BufferLineCycleNext<CR>
 nnoremap <silent> <C-[> :BufferLineCyclePrev<CR>
 nnoremap <silent> <esc> :BufferLineCyclePrev<CR>
-nnoremap gt <cmd>TroubleToggle workspace_diagnostics<cr>
+nnoremap gt <cmd>Trouble diagnostics toggle<cr>
 
 lua << EOF
 require('gitsigns').setup()
 require"fidget".setup{}
+
+require('trouble').setup()
 
 local nvim_lsp = require('lspconfig')
 
