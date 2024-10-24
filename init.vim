@@ -110,7 +110,7 @@ cmp.event:on(
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 -- Typescript
-nvim_lsp.tsserver.setup {
+nvim_lsp.ts_ls.setup {
     capabilities = capabilities,
 }
 
