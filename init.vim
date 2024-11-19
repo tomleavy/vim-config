@@ -51,19 +51,8 @@ require('trouble').setup()
 
 local nvim_lsp = require('lspconfig')
 
-local eslint = {
-  lintCommand = "eslint_d -f unix --stdin --stdin-filename ${INPUT}",
-  lintStdin = true,
-  lintFormats = {"%f:%l:%c: %m"},
-  lintIgnoreExitCode = true,
-  formatCommand = "eslint_d --fix-to-stdout --stdin --stdin-filename=${INPUT}",
-  formatStdin = true
-}
-
 -- Completion
-require('nvim-autopairs').setup{
-    enable_check_bracket_line = false
-}
+require('nvim-autopairs').setup{}
 
 local cmp = require'cmp'
 
@@ -90,22 +79,15 @@ cmp.setup{
     }),
   },
   -- Installed sources
-  sources = {
+  sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'nvim_lsp_signature_help' },
     { name = 'nvim_lua' },
     { name = 'path' },
-    { name = 'buffer'},
-  },
+    }, {
+      { name = 'buffer'},
+    })
 }
-
--- If you want insert `(` after select function or method item
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-
-cmp.event:on(
-  'confirm_done',
-  cmp_autopairs.on_confirm_done()
-)
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
@@ -117,19 +99,9 @@ nvim_lsp.ts_ls.setup {
 nvim_lsp.eslint.setup {
     capabilities = capabilities,
     on_attach = function(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = true
-
-        if client.server_capabilities.documentFormattingProvider then
-            local au_lsp = vim.api.nvim_create_augroup("eslint_lsp", { clear = true })
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                pattern = "*",
-                callback = function()
-                    vim.lsp.buf.format({ async = true })
-                end,
-            group = au_lsp,
-        })
-        end
-  end,
+        vim.lsp.buf.format()
+        vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+    end,
 }
 
 -- Mappings.
@@ -139,47 +111,43 @@ local opts = { noremap=true, silent=true }
 local on_attach = function(client, bufnr)
 end
 
-local opts = {
-    tools = { -- rust-tools options
-        autoSetHints = true,
-        inlay_hints = {
-            show_parameter_hints = true,
-            only_current_line = false,
-            parameter_hints_prefix = "< ",
-            other_hints_prefix = "\194\187 ",
+vim.g.rustaceanvim = {
+  -- Plugin configuration
+  tools = {
+    autoSetHints = true,
+    inlay_hints = {
+        show_parameter_hints = true,
+        only_current_line = false,
+        parameter_hints_prefix = "< ",
+        other_hints_prefix = "\194\187 ",
+    },
+  },
+  -- LSP configuration
+  server = {
+    on_attach = on_attach,
+    capabilities = capabilities,
+    
+    default_settings = {
+      -- rust-analyzer language server configuration
+      ['rust-analyzer'] = {
+        cargo = {
+            -- target = "i686-linux-android"
+            features = "all",
         },
+        check = {
+            allTargets = true,
+            features = "all",
+            command = "clippy",
+        },
+      },
     },
-
-    -- all the opts to send to nvim-lspconfig
-    -- these override the defaults set by rust-tools.nvim
-    -- see https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#rust_analyzer
-    server = {
-        capabilities = capabilities,
-        on_attach = on_attach,
-        settings = {
-            -- to enable rust-analyzer settings visit:
-            -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
-            ["rust-analyzer"] = {
-                cargo = {
-                    -- target = "i686-linux-android"
-                    features = "all",
-                },
-                check = {
-                    allTargets = true,
-                    features = "all",
-                    command = "clippy",
-                },
-            }
-        }
-    },
+  },
+  -- DAP configuration
+  dap = {
+  },
 }
 
-require('rust-tools').setup(opts)
-
 -- Command:
--- RustRunnables
-require('rust-tools.runnables').runnables()
-
 require'lspconfig'.ccls.setup{}
 
 -- Treesitter
@@ -219,10 +187,10 @@ noremap <silent>K :lua vim.lsp.buf.hover()<CR>
 " LSP Find Usage
 " nnoremap <silent>gh <Cmd>Lspsaga lsp_finder<CR>
 nnoremap <silent>gh :lua require('telescope.builtin').lsp_definitions({jump_type = "never"})<CR> 	
+noremap <silent> gu :lua require('telescope.builtin').lsp_references({jump_type = "never"})<CR>
 
 " Rust run tests
-nnoremap <silent>gb :RustRunnables<CR>
-
+nnoremap <silent>gb :lua vim.cmd.RustLsp('runnables')<CR>
 
 " LSP Code Action
 "nnoremap <silent>ga :Lspsaga code_action<CR>

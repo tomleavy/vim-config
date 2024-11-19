@@ -9,6 +9,7 @@ Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
 Plug 'simrat39/rust-tools.nvim'
+Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.14.1' }
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/bufferline.nvim'
