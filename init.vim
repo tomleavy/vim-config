@@ -54,42 +54,13 @@ local nvim_lsp = require('lspconfig')
 -- Completion
 require('nvim-autopairs').setup{}
 
-local cmp = require'cmp'
-
-cmp.setup{
-  snippet = {
-    expand = function(args)
-      vim.snippet.expand(args.body)
-    end,
-  },
-  mapping = {
-    ['<Tab>'] = cmp.mapping.select_next_item(),
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-    ['<Down>'] = cmp.mapping.select_next_item(),
-    ['<Up>'] = cmp.mapping.select_prev_item(),
-    ['<esc>'] = {
-        c = function()
-            local cmp = require('cmp')
-            cmp.mapping.abort()
-            vim.cmd('stopinsert')
-        end
-    },
-    ['<CR>'] = cmp.mapping.confirm({
-      select = true,
-    }),
-  },
-  -- Installed sources
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'nvim_lsp_signature_help' },
-    { name = 'nvim_lua' },
-    { name = 'path' },
-    }, {
-      { name = 'buffer'},
-    })
+require('blink.cmp').setup {
+    keymap = {
+        preset = 'enter'
+    }
 }
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 -- Typescript
 nvim_lsp.ts_ls.setup {
@@ -109,6 +80,15 @@ local opts = { noremap=true, silent=true }
 
 -- RUST
 local on_attach = function(client, bufnr)
+    for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) do
+        local default_diagnostic_handler = vim.lsp.handlers[method]
+        vim.lsp.handlers[method] = function(err, result, context, config)
+            if err ~= nil and err.code == -32802 then
+                return
+            end
+            return default_diagnostic_handler(err, result, context, config)
+        end
+    end
 end
 
 vim.g.rustaceanvim = {
