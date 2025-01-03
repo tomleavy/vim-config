@@ -110,6 +110,13 @@ vim.g.rustaceanvim = {
     default_settings = {
       -- rust-analyzer language server configuration
       ['rust-analyzer'] = {
+        files = {
+            excludeDirs = {
+                ".git",
+                "build",
+                "target",
+            }
+        },
         cargo = {
             -- target = "i686-linux-android"
             features = "all",
@@ -118,6 +125,7 @@ vim.g.rustaceanvim = {
             allTargets = true,
             features = "all",
             command = "clippy",
+            extraArgs = { "--no-deps" }
         },
       },
     },
