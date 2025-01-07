@@ -204,6 +204,8 @@ nnoremap <silent> ff <cmd>Telescope find_files<cr>
 nnoremap <silent> fg <cmd>Telescope live_grep<cr>
 nnoremap <silent> fd <cmd>Telescope current_buffer_fuzzy_find<cr>
 
+nnoremap <silent> <C-i> :lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<CR>
+
 set signcolumn=yes
 
 lua << EOF
