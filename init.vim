@@ -144,6 +144,16 @@ vim.g.rustaceanvim = {
   },
 }
 
+local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.rs",
+  callback = function()
+      vim.lsp.buf.format({ timeout_ms = 500 })
+  end,
+  group = format_sync_grp,
+})
+
 -- Command:
 require'lspconfig'.ccls.setup{}
 
@@ -311,16 +321,6 @@ lualine.setup {
   tabline = {},
   extensions = {'fugitive'}
 }
-
-local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.rs",
-  callback = function()
-      vim.lsp.buf.format({ timeout_ms = 500 })
-  end,
-  group = format_sync_grp,
-})
 
 -- Swift
 require'lspconfig'.sourcekit.setup{
