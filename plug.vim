@@ -40,5 +40,5 @@ Plug 'amitds1997/remote-nvim.nvim'
 Plug 'huggingface/llm.nvim'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'ray-x/starry.nvim'
-Plug 'Saghen/blink.cmp', { 'tag': 'v0.9.3' }
+Plug 'Saghen/blink.cmp', { 'tag': 'v0.10.0' }
 call plug#end()
