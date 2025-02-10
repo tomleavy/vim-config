@@ -40,5 +40,13 @@ Plug 'amitds1997/remote-nvim.nvim'
 Plug 'huggingface/llm.nvim'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'ray-x/starry.nvim'
-Plug 'Saghen/blink.cmp', { 'tag': 'v0.10.0' }
+Plug 'Saghen/blink.cmp', { 'tag': 'v0.11.0' }
+Plug 'Saghen/blink.compat', { 'tag': 'v2.4.0' }
+
+" Avante Deps
+Plug 'stevearc/dressing.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'MunifTanjim/nui.nvim'
+Plug 'MeanderingProgrammer/render-markdown.nvim'
+Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make', 'source': 'true' }
 call plug#end()

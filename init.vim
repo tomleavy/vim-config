@@ -54,6 +54,22 @@ local nvim_lsp = require('lspconfig')
 -- Completion
 require('nvim-autopairs').setup{}
 
+-- views can only be fully collapsed with the global statusline
+vim.opt.laststatus = 3
+
+-- AI Stuff 
+require('avante_lib').load()
+
+require('avante').setup {
+    file_selector = {
+        provider = "telescope",
+        provider_opts = {},
+    },
+    provider = "bedrock",
+}
+
+require('blink.compat').setup()
+
 require('blink.cmp').setup {
     keymap = {
         preset = 'enter'
@@ -62,11 +78,43 @@ require('blink.cmp').setup {
         documentation = {
             auto_show = true,
             auto_show_delay_ms = 500,  
-        }
+        },
+        accept = { auto_brackets = { enabled = false }, },
+        ghost_text = { enabled = true },
     },
     sources = {
-        cmdline = {}
-    }
+        default = {
+            "lsp",
+            "path",
+            "snippets",
+            "buffer",
+            "avante_commands",
+            "avante_mentions",
+            "avante_files",
+        },
+        providers = {
+            avante_commands = {
+              name = "avante_commands",
+              module = "blink.compat.source",
+              score_offset = 90, -- show at a higher priority than lsp
+              opts = {},
+            },
+            avante_files = {
+              name = "avante_files",
+              module = "blink.compat.source",
+              score_offset = 100, -- show at a higher priority than lsp
+              opts = {},
+            },
+            avante_mentions = {
+              name = "avante_mentions",
+              module = "blink.compat.source",
+              score_offset = 1000, -- show at a higher priority than lsp
+              opts = {},
+            }
+        },
+        cmdline = {},
+    },
+    signature = { enabled = true }
 }
 
 local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -330,6 +378,9 @@ require'lspconfig'.sourcekit.setup{
 require'lspconfig'.pyright.setup {
     capabilities = capabilities
 }
+
+
+
 
 EOF
 
