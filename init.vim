@@ -57,16 +57,24 @@ require('nvim-autopairs').setup{}
 -- views can only be fully collapsed with the global statusline
 vim.opt.laststatus = 3
 
--- AI Stuff 
-require('avante_lib').load()
+-- Alias a command to refresh bedrock keys 
+local refresh_bedrock_keys = function(opts)
+    local key = vim.system({'/opt/bin/bedrock_key_refresh'}, {text = true}):wait().stdout
+    vim.env.BEDROCK_KEYS = string.sub(key,1,-2)
 
-require('avante').setup {
-    file_selector = {
-        provider = "telescope",
-        provider_opts = {},
-    },
-    provider = "bedrock",
-}
+    -- AI Stuff 
+    require('avante_lib').load()
+
+    require('avante').setup {
+        file_selector = {
+            provider = "telescope",
+            provider_opts = {},
+        },
+        provider = "bedrock",
+    }
+end
+
+vim.api.nvim_create_user_command('AvanteKeyRefresh', refresh_bedrock_keys, {})
 
 require('blink.compat').setup()
 
@@ -114,7 +122,7 @@ require('blink.cmp').setup {
         },
         cmdline = {},
     },
-    signature = { enabled = true }
+    signature = { enabled = false }
 }
 
 local capabilities = require("blink.cmp").get_lsp_capabilities()
