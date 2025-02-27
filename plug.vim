@@ -8,8 +8,7 @@ Plug 'hoob3rt/lualine.nvim'
 Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
-Plug 'simrat39/rust-tools.nvim'
-Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.14.1' }
+Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.25.0' }
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/bufferline.nvim'
@@ -40,7 +39,7 @@ Plug 'amitds1997/remote-nvim.nvim'
 Plug 'huggingface/llm.nvim'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'ray-x/starry.nvim'
-Plug 'Saghen/blink.cmp', { 'tag': 'v0.11.0' }
+Plug 'Saghen/blink.cmp', { 'tag': 'v0.13.0' }
 Plug 'Saghen/blink.compat', { 'tag': 'v2.4.0' }
 
 " Avante Deps

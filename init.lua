@@ -1,53 +1,55 @@
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+local data_dir = vim.fn.stdpath('data') .. '/site'
 
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync
-endif
+if vim.fn.empty(vim.fn.glob(data_dir .. '/autoload/plug.vim')) > 0 then
+  vim.fn.system({'curl', '-fLo', data_dir .. '/autoload/plug.vim', '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'})
+  vim.cmd [[autocmd VimEnter * PlugInstall --sync]]
+end
 
-set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 0
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 4
+vim.opt.smarttab = true
 
-autocmd Filetype typescript setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
-autocmd Filetype javascript setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
-autocmd Filetype json setlocal tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {"typescript", "javascript", "json"},
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 0
+    vim.opt_local.expandtab = true
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.smarttab = true
+  end
+})
 
-set number
-set termguicolors
+vim.opt.number = true
+vim.opt.termguicolors = true
+
+-- Plugins
+vim.cmd [[source ~/.config/nvim/plug.vim]]
+
+vim.cmd [[colorscheme tokyonight-night]]
+
+vim.cmd [[syntax on]]
+vim.opt.cursorline = true
+
+vim.opt.completeopt = "menu,menuone,noselect"
+vim.opt.shortmess:append("c")
+vim.opt.spell = true
+
+vim.g.floaterm_height = 0.95
+vim.g.floaterm_width = 0.75
 
 
-
-" Plugins
-source ~/.config/nvim/plug.vim
-
-
-colorscheme tokyonight-night
-
-syntax on
-set t_Co=256
-set cursorline
-
-set completeopt=menu,menuone,noselect
-set shortmess+=c
-set spell
-
-let g:floaterm_height = 0.95
-let g:floaterm_width = 0.75
-
-lua << EOF
 require("bufferline").setup{}
-
-EOF
-
-nnoremap <silent> <C-]> :BufferLineCycleNext<CR>
-nnoremap <silent> <C-[> :BufferLineCyclePrev<CR>
-nnoremap <silent> <esc> :BufferLineCyclePrev<CR>
-nnoremap gt <cmd>Trouble diagnostics toggle<cr>
-
-lua << EOF
 require('gitsigns').setup()
 require"fidget".setup{}
-
 require('trouble').setup()
+
+vim.keymap.set('n', '<C-]>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-[>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<esc>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle<CR>', { noremap = true, silent = true })
 
 local nvim_lsp = require('lspconfig')
 
@@ -90,6 +92,9 @@ require('blink.cmp').setup {
         accept = { auto_brackets = { enabled = false }, },
         ghost_text = { enabled = true },
     },
+    cmdline = {
+        sources = {}
+    },
     sources = {
         default = {
             "lsp",
@@ -120,7 +125,6 @@ require('blink.cmp').setup {
               opts = {},
             }
         },
-        cmdline = {},
     },
     signature = { enabled = false }
 }
@@ -183,7 +187,7 @@ vim.g.rustaceanvim = {
             }
         },
         cargo = {
-            -- target = "i686-linux-android"
+            -- target = "i686-linux-android",
             features = "all",
         },
         check = {
@@ -239,42 +243,47 @@ require'nvim-treesitter.configs'.setup {
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 
-EOF
+-- Spell suggestion
+vim.keymap.set('n', 'gs', 'z=', { noremap = true, silent = true })
 
-nnoremap <silent>gs z=
+-- Hover Doc
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, { noremap = true, silent = true })
 
-" Hover Doc
-"nnoremap <silent>K :Lspsaga hover_doc<CR>
-noremap <silent>K :lua vim.lsp.buf.hover()<CR>
+-- LSP Find Usage
+vim.keymap.set('n', 'gh', function()
+    require('telescope.builtin').lsp_definitions({jump_type = "never"})
+end, { noremap = true, silent = true })
+vim.keymap.set('n', 'gu', function()
+    require('telescope.builtin').lsp_references({jump_type = "never"})
+end, { noremap = true, silent = true })
 
-" LSP Find Usage
-" nnoremap <silent>gh <Cmd>Lspsaga lsp_finder<CR>
-nnoremap <silent>gh :lua require('telescope.builtin').lsp_definitions({jump_type = "never"})<CR> 	
-noremap <silent> gu :lua require('telescope.builtin').lsp_references({jump_type = "never"})<CR>
+-- Rust run tests
+vim.keymap.set('n', 'gb', function()
+    vim.cmd.RustLsp('runnables')
+end, { noremap = true, silent = true })
 
-" Rust run tests
-nnoremap <silent>gb :lua vim.cmd.RustLsp('runnables')<CR>
+-- LSP Code Action
+vim.keymap.set('n', 'ga', vim.lsp.buf.code_action, { noremap = true, silent = true })
 
-" LSP Code Action
-"nnoremap <silent>ga :Lspsaga code_action<CR>
-nnoremap <silent>ga :lua vim.lsp.buf.code_action()<CR>
+-- Vertical Split
+vim.keymap.set('n', '<C-t>', ':vsp<CR>', { noremap = true, silent = true })
 
-" Vertical Split
-nnoremap <silent> <C-t> :vsp<CR>
+-- Line diagnostics
+vim.keymap.set('n', 'gd', vim.diagnostic.open_float, { noremap = true, silent = true })
 
-" Line diagnostics
-nnoremap <silent>gd :lua vim.diagnostic.open_float()<CR>
+-- Telescope Bindings
+vim.keymap.set('n', 'ff', '<cmd>Telescope find_files<cr>', { noremap = true, silent = true })
+vim.keymap.set('n', 'fg', '<cmd>Telescope live_grep<cr>', { noremap = true, silent = true })
+vim.keymap.set('n', 'fd', '<cmd>Telescope current_buffer_fuzzy_find<cr>', { noremap = true, silent = true })
 
-" Telescope Bindings
-nnoremap <silent> ff <cmd>Telescope find_files<cr>
-nnoremap <silent> fg <cmd>Telescope live_grep<cr>
-nnoremap <silent> fd <cmd>Telescope current_buffer_fuzzy_find<cr>
+-- Toggle inlay hints
+vim.keymap.set('n', '<C-i>', function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { noremap = true, silent = true })
 
-nnoremap <silent> <C-i> :lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<CR>
+-- Set signcolumn
+vim.opt.signcolumn = "yes"
 
-set signcolumn=yes
-
-lua << EOF
 require('telescope').setup{ 
     extensions = {
         ["ui-select"] = {
@@ -323,14 +332,10 @@ vim.keymap.set("n", "gr", function()
   return ":IncRename " .. vim.fn.expand("<cword>")
 end, { expr = true })
 
-EOF
+-- Floating Terminal
+vim.keymap.set('n', 'tt', ':FloatermToggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>:FloatermToggle<CR>', { noremap = true, silent = true })
 
-"Floating Terminal
-nnoremap <silent> tt :FloatermToggle<CR>
-tnoremap <Esc> <C-\><C-n>:FloatermToggle<CR>
-
-" Close Telescope Windows
-lua << EOF
 local actions = require('telescope.actions')
 require('telescope').setup{
   defaults = {
@@ -341,9 +346,7 @@ require('telescope').setup{
     },
   }
 }
-EOF
 
-lua << EOF
 local status, lualine = pcall(require, "lualine")
 if (not status) then return end
 lualine.setup {
@@ -387,13 +390,22 @@ require'lspconfig'.pyright.setup {
     capabilities = capabilities
 }
 
+vim.api.nvim_create_autocmd({"FileType"}, {
+  pattern = {"swift"},
+  callback = function()
+    vim.api.nvim_create_autocmd({"BufWritePost"}, {
+      pattern = {"*.swift"},
+      command = "silent !swiftformat %"
+    })
+  end
+})
 
-
-
-EOF
-
-autocmd FileType swift autocmd BufWritePost *.swift :silent exec "!swiftformat %"
-
-if has('nvim')
-  autocmd BufRead Cargo.toml call crates#toggle()
-endif
+-- Toggle crates for Cargo.toml
+if vim.fn.has('nvim') == 1 then
+  vim.api.nvim_create_autocmd({"BufRead"}, {
+    pattern = {"Cargo.toml"},
+    callback = function()
+      vim.fn['crates#toggle']()
+    end
+  })
+end
