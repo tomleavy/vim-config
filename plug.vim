@@ -47,5 +47,10 @@ Plug 'stevearc/dressing.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'MunifTanjim/nui.nvim'
 Plug 'MeanderingProgrammer/render-markdown.nvim'
+Plug 'HakonHarnes/img-clip.nvim'
 Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make', 'source': 'true' }
+
+" Code Companion
+Plug 'olimorris/codecompanion.nvim', { 'tag': 'v13.2.3' }
+
 call plug#end()

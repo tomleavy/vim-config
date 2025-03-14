@@ -12,7 +12,7 @@ vim.opt.shiftwidth = 4
 vim.opt.smarttab = true
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {"typescript", "javascript", "json"},
+  pattern = {"typescript", "javascript", "json", "lua"},
   callback = function()
     vim.opt_local.tabstop = 2
     vim.opt_local.softtabstop = 0
@@ -46,10 +46,17 @@ require('gitsigns').setup()
 require"fidget".setup{}
 require('trouble').setup()
 
+require('render-markdown').setup {
+  file_types = { "markdown", "codecompanion" }
+}
+
+vim.treesitter.language.register('markdown', 'codecompanion')
+
 vim.keymap.set('n', '<C-]>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-[>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<esc>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'gc', ':CodeCompanionChat Toggle<CR>', { noremap = true, silent = true })
 
 local nvim_lsp = require('lspconfig')
 
@@ -64,17 +71,84 @@ local refresh_bedrock_keys = function(opts)
     local key = vim.system({'/opt/bin/bedrock_key_refresh'}, {text = true}):wait().stdout
     vim.env.BEDROCK_KEYS = string.sub(key,1,-2)
 
-    -- AI Stuff 
-    require('avante_lib').load()
-
-    require('avante').setup {
-        file_selector = {
-            provider = "telescope",
-            provider_opts = {},
-        },
-        provider = "bedrock",
-    }
+    
 end
+
+-- AI Stuff 
+require('avante_lib').load()
+
+require('avante').setup {
+    file_selector = {
+        provider = "telescope",
+        provider_opts = {},
+    },
+    provider = "openai",
+    openai = {
+      endpoint = "http://Fargat-Proxy-X4Z503HThxuQ-2142124040.us-east-1.elb.amazonaws.com/api/v1",
+      model = "us.anthropic.claude-3-7-sonnet-20250219-v1:0", -- your desired model (or use gpt-4o, etc.)
+      timeout = 30000, -- timeout in milliseconds
+      temperature = 0, -- adjust if needed
+      max_tokens = 8000,
+      -- reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
+    },
+}
+
+require("codecompanion").setup({
+  adapters = {
+    opts = {
+      show_defaults = false,
+    },
+    bedrock = function()
+      return require("codecompanion.adapters").extend("openai_compatible", {
+        name = "bedrock",
+        url = "http://Fargat-Proxy-X4Z503HThxuQ-2142124040.us-east-1.elb.amazonaws.com/api/v1/chat/completions",
+        opts = {
+          show_defaults = false,
+          stream = true,
+        },
+        env = {
+          api_key = function()
+            return vim.env.OPENAI_API_KEY
+          end
+        },
+        parameters = {
+          stream = true,
+          stream_options = { include_usage = true },
+        },
+        schema = {
+          model = {
+            order = 1,
+            mapping = "parameters",
+            type = "enum",
+            desc = "bedrock 3.7 model",
+            default = "us.anthropic.claude-3-7-sonnet-20250219-v1:0",  -- define llm model to be used
+            choices = {
+              ["us.anthropic.claude-3-7-sonnet-20250219-v1:0"] = { opts = { can_reason = true, stream = true } }
+            },
+          },
+        },
+      })
+    end,
+  },
+  display = {
+    chat = {
+      show_settings = true,
+      window = {
+        position = "right",
+        width = 0.40,
+        relative = "editor"
+      }
+    },
+    diff = {
+      enabled = false,
+    }
+  },
+  strategies = {
+    chat = { adapter = "bedrock" },
+    inline = { adapter = "bedrock" },
+    agent = { adapter = "bedrock" },
+  },
+})
 
 vim.api.nvim_create_user_command('AvanteKeyRefresh', refresh_bedrock_keys, {})
 
