@@ -74,25 +74,6 @@ local refresh_bedrock_keys = function(opts)
     
 end
 
--- AI Stuff 
-require('avante_lib').load()
-
-require('avante').setup {
-    file_selector = {
-        provider = "telescope",
-        provider_opts = {},
-    },
-    provider = "openai",
-    openai = {
-      endpoint = "http://Fargat-Proxy-X4Z503HThxuQ-2142124040.us-east-1.elb.amazonaws.com/api/v1",
-      model = "us.anthropic.claude-3-7-sonnet-20250219-v1:0", -- your desired model (or use gpt-4o, etc.)
-      timeout = 30000, -- timeout in milliseconds
-      temperature = 0, -- adjust if needed
-      max_tokens = 8000,
-      -- reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-    },
-}
-
 require("codecompanion").setup({
   adapters = {
     opts = {
@@ -120,11 +101,35 @@ require("codecompanion").setup({
             order = 1,
             mapping = "parameters",
             type = "enum",
-            desc = "bedrock 3.7 model",
+            desc = "ID of the model to use. See the model endpoint compatibility table for details on which models work with the Chat API.",
             default = "us.anthropic.claude-3-7-sonnet-20250219-v1:0",  -- define llm model to be used
             choices = {
               ["us.anthropic.claude-3-7-sonnet-20250219-v1:0"] = { opts = { can_reason = true, stream = true } }
             },
+          },
+          reasoning_effort = {
+            order = 2,
+            mapping = "parameters",
+            type = "string",
+            optional = false,
+            default = "medium",
+            desc = "Constrains effort on reasoning for reasoning models. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.",
+            choices = {
+              "high",
+              "medium",
+              "low",
+            },
+          },
+          max_tokens = {
+            order = 6,
+            mapping = "parameters",
+            type = "integer",
+            optional = false,
+            default = 100000,
+            desc = "The maximum number of tokens to generate in the chat completion. The total length of input tokens and generated tokens is limited by the model's context length.",
+            validate = function(n)
+              return n > 0, "Must be greater than 0"
+            end,
           },
         },
       })

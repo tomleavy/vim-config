@@ -8,7 +8,7 @@ Plug 'hoob3rt/lualine.nvim'
 Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
-Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.25.0' }
+Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.25.1' }
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/bufferline.nvim'
@@ -39,7 +39,7 @@ Plug 'amitds1997/remote-nvim.nvim'
 Plug 'huggingface/llm.nvim'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'ray-x/starry.nvim'
-Plug 'Saghen/blink.cmp', { 'tag': 'v0.13.0' }
+Plug 'Saghen/blink.cmp', { 'tag': 'v0.13.1' }
 Plug 'Saghen/blink.compat', { 'tag': 'v2.4.0' }
 
 " Avante Deps
@@ -51,6 +51,6 @@ Plug 'HakonHarnes/img-clip.nvim'
 Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make', 'source': 'true' }
 
 " Code Companion
-Plug 'olimorris/codecompanion.nvim', { 'tag': 'v13.2.3' }
+Plug 'olimorris/codecompanion.nvim', { 'tag': 'v14.3.0' }
 
 call plug#end()
