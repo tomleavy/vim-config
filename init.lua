@@ -213,15 +213,13 @@ local capabilities = require("blink.cmp").get_lsp_capabilities()
 -- Typescript
 nvim_lsp.ts_ls.setup {
     capabilities = capabilities,
-}
-
-nvim_lsp.eslint.setup {
-    capabilities = capabilities,
     on_attach = function(client, bufnr)
         vim.lsp.buf.format()
         vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
-    end,
+    end
 }
+
+require('nvim-eslint').setup({})
 
 -- Mappings.
 local opts = { noremap=true, silent=true }
