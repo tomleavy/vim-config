@@ -41,7 +41,6 @@ Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'ray-x/starry.nvim'
 Plug 'Saghen/blink.cmp', { 'tag': 'v0.13.1' }
 Plug 'Saghen/blink.compat', { 'tag': 'v2.4.0' }
-Plug 'esmuellert/nvim-eslint'
 
 " Avante Deps
 Plug 'stevearc/dressing.nvim'

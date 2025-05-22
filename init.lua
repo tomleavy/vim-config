@@ -213,13 +213,22 @@ local capabilities = require("blink.cmp").get_lsp_capabilities()
 -- Typescript
 nvim_lsp.ts_ls.setup {
     capabilities = capabilities,
-    on_attach = function(client, bufnr)
-        vim.lsp.buf.format()
-        vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
-    end
 }
 
-require('nvim-eslint').setup({})
+local base_on_attach = vim.lsp.config.eslint.on_attach
+vim.lsp.config("eslint", {
+  on_attach = function(client, bufnr)
+    if not base_on_attach then return end
+
+    base_on_attach(client, bufnr)
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "LspEslintFixAll",
+    })
+  end,
+})
+
+vim.lsp.enable('eslint')
 
 -- Mappings.
 local opts = { noremap=true, silent=true }
