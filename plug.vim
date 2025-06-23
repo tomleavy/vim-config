@@ -51,6 +51,6 @@ Plug 'HakonHarnes/img-clip.nvim'
 Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make', 'source': 'true' }
 
 " Code Companion
-Plug 'olimorris/codecompanion.nvim', { 'tag': 'v14.3.0' }
+Plug 'olimorris/codecompanion.nvim', { 'tag': 'v15.9.0' }
 
 call plug#end()
