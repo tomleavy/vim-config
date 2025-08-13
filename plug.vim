@@ -8,7 +8,7 @@ Plug 'hoob3rt/lualine.nvim'
 Plug 'overcache/NeoSolarized'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'voldikss/vim-floaterm'
-Plug 'mrcjkb/rustaceanvim', { 'tag': 'v5.25.1' }
+Plug 'mrcjkb/rustaceanvim', { 'tag': 'v6.7.0' }
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/bufferline.nvim'

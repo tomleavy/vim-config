@@ -5,6 +5,8 @@ if vim.fn.empty(vim.fn.glob(data_dir .. '/autoload/plug.vim')) > 0 then
   vim.cmd [[autocmd VimEnter * PlugInstall --sync]]
 end
 
+vim.opt.mouse = ""
+
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 0
 vim.opt.expandtab = true
