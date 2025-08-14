@@ -6,7 +6,6 @@ if vim.fn.empty(vim.fn.glob(data_dir .. '/autoload/plug.vim')) > 0 then
 end
 
 vim.opt.mouse = ""
-
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 0
 vim.opt.expandtab = true
@@ -29,19 +28,16 @@ vim.opt.termguicolors = true
 
 -- Plugins
 vim.cmd [[source ~/.config/nvim/plug.vim]]
-
 vim.cmd [[colorscheme tokyonight-night]]
-
 vim.cmd [[syntax on]]
-vim.opt.cursorline = true
 
+vim.opt.cursorline = true
 vim.opt.completeopt = "menu,menuone,noselect"
 vim.opt.shortmess:append("c")
 vim.opt.spell = true
 
 vim.g.floaterm_height = 0.95
 vim.g.floaterm_width = 0.75
-
 
 require("bufferline").setup{}
 require('gitsigns').setup()
@@ -62,19 +58,8 @@ vim.keymap.set('n', 'gc', ':CodeCompanionChat Toggle<CR>', { noremap = true, sil
 
 local nvim_lsp = require('lspconfig')
 
--- Completion
-require('nvim-autopairs').setup{}
-
 -- views can only be fully collapsed with the global statusline
 vim.opt.laststatus = 3
-
--- Alias a command to refresh bedrock keys 
-local refresh_bedrock_keys = function(opts)
-    local key = vim.system({'/opt/bin/bedrock_key_refresh'}, {text = true}):wait().stdout
-    vim.env.BEDROCK_KEYS = string.sub(key,1,-2)
-
-    
-end
 
 require("codecompanion").setup({
   adapters = {
@@ -157,10 +142,6 @@ require("codecompanion").setup({
   },
 })
 
-vim.api.nvim_create_user_command('AvanteKeyRefresh', refresh_bedrock_keys, {})
-
-require('blink.compat').setup()
-
 require('blink.cmp').setup {
     keymap = {
         preset = 'enter'
@@ -170,7 +151,6 @@ require('blink.cmp').setup {
             auto_show = true,
             auto_show_delay_ms = 500,  
         },
-        accept = { auto_brackets = { enabled = false }, },
         ghost_text = { enabled = true },
     },
     cmdline = {
@@ -182,32 +162,15 @@ require('blink.cmp').setup {
             "path",
             "snippets",
             "buffer",
-            "avante_commands",
-            "avante_mentions",
-            "avante_files",
-        },
-        providers = {
-            avante_commands = {
-              name = "avante_commands",
-              module = "blink.compat.source",
-              score_offset = 90, -- show at a higher priority than lsp
-              opts = {},
-            },
-            avante_files = {
-              name = "avante_files",
-              module = "blink.compat.source",
-              score_offset = 100, -- show at a higher priority than lsp
-              opts = {},
-            },
-            avante_mentions = {
-              name = "avante_mentions",
-              module = "blink.compat.source",
-              score_offset = 1000, -- show at a higher priority than lsp
-              opts = {},
-            }
         },
     },
     signature = { enabled = false }
+}
+
+require('blink.pairs').setup {
+  highlights = {
+    enabled = false,
+  }
 }
 
 local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -252,12 +215,6 @@ vim.g.rustaceanvim = {
   -- Plugin configuration
   tools = {
     autoSetHints = true,
-    inlay_hints = {
-        show_parameter_hints = true,
-        only_current_line = false,
-        parameter_hints_prefix = "< ",
-        other_hints_prefix = "\194\187 ",
-    },
   },
   -- LSP configuration
   server = {
@@ -275,20 +232,14 @@ vim.g.rustaceanvim = {
             }
         },
         cargo = {
-            -- target = "i686-linux-android",
             features = "all",
         },
         check = {
-            allTargets = true,
             features = "all",
             command = "clippy",
-            extraArgs = { "--no-deps" }
         },
       },
     },
-  },
-  -- DAP configuration
-  dap = {
   },
 }
 
@@ -375,23 +326,7 @@ vim.opt.signcolumn = "yes"
 require('telescope').setup{ 
     extensions = {
         ["ui-select"] = {
-          require("telescope.themes").get_dropdown {
-            -- even more opts
-          }
-
-          -- pseudo code / specification for writing custom displays, like the one
-          -- for "codeactions"
-          -- specific_opts = {
-          --   [kind] = {
-          --     make_indexed = function(items) -> indexed_items, width,
-          --     make_displayer = function(widths) -> displayer
-          --     make_display = function(displayer) -> function(e)
-          --     make_ordinal = function(e) -> string
-          --   },
-          --   -- for example to disable the custom builtin "codeactions" display
-          --      do the following
-          --   codeactions = false,
-          -- }
+          require("telescope.themes").get_dropdown {}
         }
     },
     defaults = { 
@@ -407,8 +342,6 @@ require('telescope').setup{
         }
     },
 }
-
-require("dressing").setup{}
 
 require("inc_rename").setup {
     input_buffer_type = "dressing",
