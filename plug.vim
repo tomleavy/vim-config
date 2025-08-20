@@ -20,4 +20,5 @@ Plug 'Saghen/blink.pairs', { 'tag': 'v0.3.0' }
 Plug 'Saghen/blink.download',
 Plug 'olimorris/codecompanion.nvim', { 'tag': 'v17.15.0' }
 Plug 'MeanderingProgrammer/render-markdown.nvim', { 'tag': 'v8.7.0' }
+Plug 'mhinz/vim-crates'
 call plug#end()
