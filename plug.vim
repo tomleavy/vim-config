@@ -10,6 +10,7 @@ Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/bufferline.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'folke/trouble.nvim'
+Plug 'stevearc/dressing.nvim'
 Plug 'tpope/vim-repeat'
 Plug 'nvim-telescope/telescope-ui-select.nvim'
 Plug 'lewis6991/gitsigns.nvim'
