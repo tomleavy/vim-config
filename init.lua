@@ -55,91 +55,22 @@ vim.keymap.set('n', '<C-[>', ':BufferLineCyclePrev<CR>', { noremap = true, silen
 vim.keymap.set('n', '<esc>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gc', ':CodeCompanionChat Toggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'gq', ':AmazonQ<CR>', { noremap = true, silent = true })
 
 local nvim_lsp = require('lspconfig')
 
 -- views can only be fully collapsed with the global statusline
 vim.opt.laststatus = 3
 
-require("codecompanion").setup({
-  adapters = {
-    opts = {
-      show_defaults = false,
-    },
-    bedrock = function()
-      return require("codecompanion.adapters").extend("openai_compatible", {
-        name = "bedrock",
-        url = "http://Fargat-Proxy-X4Z503HThxuQ-2142124040.us-east-1.elb.amazonaws.com/api/v1/chat/completions",
-        opts = {
-          show_defaults = false,
-          stream = true,
-        },
-        env = {
-          api_key = function()
-            return vim.env.OPENAI_API_KEY
-          end
-        },
-        parameters = {
-          stream = true,
-          stream_options = { include_usage = true },
-        },
-        schema = {
-          model = {
-            order = 1,
-            mapping = "parameters",
-            type = "enum",
-            desc = "ID of the model to use. See the model endpoint compatibility table for details on which models work with the Chat API.",
-            default = "us.anthropic.claude-3-7-sonnet-20250219-v1:0",  -- define llm model to be used
-            choices = {
-              ["us.anthropic.claude-3-7-sonnet-20250219-v1:0"] = { opts = { can_reason = true, stream = true } }
-            },
-          },
-          reasoning_effort = {
-            order = 2,
-            mapping = "parameters",
-            type = "string",
-            optional = false,
-            default = "medium",
-            desc = "Constrains effort on reasoning for reasoning models. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.",
-            choices = {
-              "high",
-              "medium",
-              "low",
-            },
-          },
-          max_tokens = {
-            order = 6,
-            mapping = "parameters",
-            type = "integer",
-            optional = false,
-            default = 100000,
-            desc = "The maximum number of tokens to generate in the chat completion. The total length of input tokens and generated tokens is limited by the model's context length.",
-            validate = function(n)
-              return n > 0, "Must be greater than 0"
-            end,
-          },
-        },
-      })
-    end,
-  },
-  display = {
-    chat = {
-      show_settings = true,
-      window = {
-        position = "right",
-        width = 0.40,
-        relative = "editor"
-      }
-    },
-    diff = {
-      enabled = false,
-    }
-  },
-  strategies = {
-    chat = { adapter = "bedrock" },
-    inline = { adapter = "bedrock" },
-    agent = { adapter = "bedrock" },
-  },
+-- amazon q
+require('amazonq').setup({
+  ssoStartUrl = vim.env.Q_START_URL, -- For Free Tier with AWS Builder ID
+  inline_suggest = false,
+  on_chat_open = function()
+    vim.cmd('botright vsplit')
+    vim.cmd('vertical resize ' .. math.floor(vim.o.columns * 0.35))
+    vim.cmd('set wrap breakindent nonumber norelativenumber nolist')
+  end
 })
 
 require('blink.cmp').setup {
