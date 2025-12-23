@@ -237,7 +237,7 @@ require('telescope').setup{
         }
     },
     defaults = { 
-        file_ignore_patterns = {"node_modules", "build/.*", "target/.*", "docs/.*"},
+        file_ignore_patterns = {"node_modules", "build/.*", "target/.*"},
         vimgrep_arguments = {
             "rg",
             "--color=never",
