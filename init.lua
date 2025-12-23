@@ -36,8 +36,6 @@ vim.opt.completeopt = "menu,menuone,noselect"
 vim.opt.shortmess:append("c")
 vim.opt.spell = true
 
-vim.g.floaterm_height = 0.95
-vim.g.floaterm_width = 0.75
 
 require'nvim-treesitter'.install { 'rust', 'javascript', 'tsx', 'json', 'yaml', 'html', 'scss', 'markdown', 'markdown_inline', 'latex' }
 
@@ -262,9 +260,36 @@ vim.keymap.set("n", "gr", function()
   return ":IncRename " .. vim.fn.expand("<cword>")
 end, { expr = true })
 
--- Floating Terminal
-vim.keymap.set('n', 'tt', ':FloatermToggle<CR>', { noremap = true, silent = true })
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>:FloatermToggle<CR>', { noremap = true, silent = true })
+-- Floating Terminal (using snacks.nvim)
+vim.keymap.set("n", "tt", function()
+  Snacks.terminal.toggle(nil, {
+    -- any other per-call options like cmd, cwd, etc.
+    win = {
+      height = 0.95,
+      width = 0.75,
+
+      -- floating 
+      relative = "editor",
+      position = "float",
+      border = "rounded",
+      style = "terminal",
+
+      keys = {
+        -- disable the built‑in double-<Esc> behavior for this terminal
+        term_normal = false,
+
+        -- make <Esc> hide this terminal
+        ["<esc>"] = {
+          function(self)
+            self:hide()
+          end,
+          mode = "t",
+          desc = "Hide Snacks terminal",
+        },
+      },
+    },
+  })
+end, { desc = "Toggle Snacks terminal" })
 
 local actions = require('telescope.actions')
 require('telescope').setup{
