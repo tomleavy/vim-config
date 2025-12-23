@@ -39,39 +39,44 @@ vim.opt.spell = true
 vim.g.floaterm_height = 0.95
 vim.g.floaterm_width = 0.75
 
+require'nvim-treesitter'.install { 'rust', 'javascript', 'tsx', 'json', 'yaml', 'html', 'scss', 'markdown', 'markdown_inline', 'latex' }
+
+-- Enable treesitter highlighting for markdown (required for render-markdown.nvim)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown" },
+  callback = function()
+    vim.treesitter.start()
+  end,
+})
+
+-- In your config (after treesitter is available)
+vim.treesitter.language.register("tsx", {
+  "javascript",
+  "typescript.tsx",
+})
+
 require("bufferline").setup{}
 require('gitsigns').setup()
-require"fidget".setup{}
+
+require"fidget".setup{
+  notification = {
+    override_vim_notify = true,
+  }
+}
 require('trouble').setup()
 
 require('render-markdown').setup {
-  file_types = { "markdown", "codecompanion" }
+  file_types = { "markdown" },
+  latex = { enabled = false }
 }
-
-vim.treesitter.language.register('markdown', 'codecompanion')
 
 vim.keymap.set('n', '<C-]>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-[>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<esc>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', 'gc', ':CodeCompanionChat Toggle<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', 'gq', ':AmazonQ<CR>', { noremap = true, silent = true })
-
-local nvim_lsp = require('lspconfig')
 
 -- views can only be fully collapsed with the global statusline
 vim.opt.laststatus = 3
-
--- amazon q
-require('amazonq').setup({
-  ssoStartUrl = vim.env.Q_START_URL, -- For Free Tier with AWS Builder ID
-  inline_suggest = false,
-  on_chat_open = function()
-    vim.cmd('botright vsplit')
-    vim.cmd('vertical resize ' .. math.floor(vim.o.columns * 0.35))
-    vim.cmd('set wrap breakindent nonumber norelativenumber nolist')
-  end
-})
 
 require('blink.cmp').setup {
     keymap = {
@@ -107,16 +112,13 @@ require('blink.pairs').setup {
 local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 -- Typescript
-nvim_lsp.ts_ls.setup {
+vim.lsp.config('ts_ls', {
     capabilities = capabilities,
-}
+})
+vim.lsp.enable('ts_ls')
 
-local base_on_attach = vim.lsp.config.eslint.on_attach
 vim.lsp.config("eslint", {
   on_attach = function(client, bufnr)
-    if not base_on_attach then return end
-
-    base_on_attach(client, bufnr)
     vim.api.nvim_create_autocmd("BufWritePre", {
       buffer = bufnr,
       command = "LspEslintFixAll",
@@ -184,34 +186,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   group = format_sync_grp,
 })
 
--- Command:
-require'lspconfig'.ccls.setup{}
+-- C/C++
+vim.lsp.config('ccls', {})
+vim.lsp.enable('ccls')
 
--- Treesitter
-require'nvim-treesitter.configs'.setup {
-  highlight = {
-    enable = true,
-    disable = {},
-  },
-  indent = {
-    enable = false,
-    disable = {},
-  },
-  ensure_installed = {
-    "tsx",
-    "toml",
-    "fish",
-    "php",
-    "json",
-    "yaml",
-    "html",
-    "scss",
-    "rust",
-    "markdown"
-  },
-}
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 
 -- Spell suggestion
 vim.keymap.set('n', 'gs', 'z=', { noremap = true, silent = true })
@@ -275,7 +253,7 @@ require('telescope').setup{
 }
 
 require("inc_rename").setup {
-    input_buffer_type = "dressing",
+    input_buffer_type = "snacks",
 }
 
 require('telescope').load_extension("ui-select")
@@ -334,13 +312,16 @@ lualine.setup {
 }
 
 -- Swift
-require'lspconfig'.sourcekit.setup{
+vim.lsp.config('sourcekit', {
     capabilities = capabilities
-}
+})
+vim.lsp.enable('sourcekit')
 
-require'lspconfig'.pyright.setup {
+-- Python
+vim.lsp.config('pyright', {
     capabilities = capabilities
-}
+})
+vim.lsp.enable('pyright')
 
 vim.api.nvim_create_autocmd({"FileType"}, {
   pattern = {"swift"},
@@ -361,3 +342,10 @@ if vim.fn.has('nvim') == 1 then
     end
   })
 end
+
+-- Claude Code 
+require('claudecode').setup()
+vim.keymap.set('n', 'gc', '<cmd>ClaudeCode<cr>', { noremap = true, silent = true })
+vim.keymap.set('n', 'gq', '<cmd>ClaudeCodeAdd %<cr>', { noremap = true, silent = true })
+
+
