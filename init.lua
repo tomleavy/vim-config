@@ -36,14 +36,12 @@ vim.opt.completeopt = "menu,menuone,noselect"
 vim.opt.shortmess:append("c")
 vim.opt.spell = true
 
+require'nvim-treesitter'.install { 'rust', 'javascript', 'tsx', 'json', 'yaml', 'html', 'scss', 'markdown', 'markdown_inline', 'latex', 'python' }
 
-require'nvim-treesitter'.install { 'rust', 'javascript', 'tsx', 'json', 'yaml', 'html', 'scss', 'markdown', 'markdown_inline', 'latex' }
-
--- Enable treesitter highlighting for markdown (required for render-markdown.nvim)
+-- Enable treesitter highlighting for all file types (required for render-markdown.nvim)
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "markdown" },
   callback = function()
-    vim.treesitter.start()
+    pcall(vim.treesitter.start)
   end,
 })
 
@@ -113,6 +111,7 @@ local capabilities = require("blink.cmp").get_lsp_capabilities()
 vim.lsp.config('ts_ls', {
     capabilities = capabilities,
 })
+
 vim.lsp.enable('ts_ls')
 
 vim.lsp.config("eslint", {
@@ -343,9 +342,58 @@ vim.lsp.config('sourcekit', {
 vim.lsp.enable('sourcekit')
 
 -- Python
-vim.lsp.config('pyright', {
-    capabilities = capabilities
+vim.lsp.config("ruff", {
+  capabilities = capabilities,
+  settings = {
+    -- Ruff language server settings go here
+  },
+  on_attach = function(client, bufnr)
+    -- Let Ruff handle formatting
+    client.server_capabilities.documentFormattingProvider = true
+
+    -- Format on save
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format({ bufnr = bufnr })
+      end,
+    })
+  end,
 })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client == nil then
+      return
+    end
+    if client.name == 'ruff' then
+      -- Disable hover in favor of Pyright
+      client.server_capabilities.hoverProvider = false
+    end
+  end,
+  desc = 'LSP: Disable hover capability from Ruff',
+})
+
+
+vim.lsp.config('pyright', {
+  settings = {
+    pyright = {
+      -- Using Ruff's import organizer
+      disableOrganizeImports = true,
+    },
+    python = {
+      analysis = {
+        -- Ignore all files for analysis to exclusively use Ruff for linting
+        ignore = { '*' },
+      },
+    },
+  },
+  capabilities = capabilities
+})
+
+vim.lsp.enable('ruff')
 vim.lsp.enable('pyright')
 
 vim.api.nvim_create_autocmd({"FileType"}, {
@@ -368,9 +416,25 @@ if vim.fn.has('nvim') == 1 then
   })
 end
 
--- Claude Code 
-require('claudecode').setup()
-vim.keymap.set('n', 'gc', '<cmd>ClaudeCode<cr>', { noremap = true, silent = true })
+-- Claude Code
+require('claudecode').setup({
+  terminal = {
+      ---@module "snacks"
+      ---@type snacks.win.Config|{}
+      snacks_win_opts = {
+        keys = {
+          claude_hide = {
+            '<C-c>',
+            function(self)
+              self:hide()
+            end,
+            mode = "t",
+            desc = "Hide",
+          },
+        },
+      },
+    },
+})
+
+vim.keymap.set({'n','x'}, 'gc', '<cmd>ClaudeCodeFocus<cr>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gq', '<cmd>ClaudeCodeAdd %<cr>', { noremap = true, silent = true })
-
-
