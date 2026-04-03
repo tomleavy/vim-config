@@ -1,9 +1,37 @@
-local data_dir = vim.fn.stdpath('data') .. '/site'
+-- Handle treesitter build on install/update
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(info)
+    if info.data.plugin == 'nvim-treesitter' then
+      vim.cmd('TSUpdate')
+    end
+  end
+})
 
-if vim.fn.empty(vim.fn.glob(data_dir .. '/autoload/plug.vim')) > 0 then
-  vim.fn.system({'curl', '-fLo', data_dir .. '/autoload/plug.vim', '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'})
-  vim.cmd [[autocmd VimEnter * PlugInstall --sync]]
-end
+vim.pack.add({
+  'https://github.com/neovim/nvim-lspconfig',
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/nvim-telescope/telescope.nvim',
+  'https://github.com/hoob3rt/lualine.nvim',
+  { src = 'https://github.com/mrcjkb/rustaceanvim', version = vim.version.range('8.x') },
+  { src = 'https://github.com/folke/tokyonight.nvim', version = vim.version.range('*') },
+  'https://github.com/kyazdani42/nvim-web-devicons',
+  'https://github.com/akinsho/bufferline.nvim',
+  'https://github.com/nvim-treesitter/nvim-treesitter',
+  'https://github.com/folke/trouble.nvim',
+  'https://github.com/tpope/vim-repeat',
+  'https://github.com/nvim-telescope/telescope-ui-select.nvim',
+  'https://github.com/lewis6991/gitsigns.nvim',
+  'https://github.com/j-hui/fidget.nvim',
+  'https://github.com/smjonas/inc-rename.nvim',
+  { src = 'https://github.com/Saghen/blink.cmp', version = vim.version.range('1.x') },
+  { src = 'https://github.com/Saghen/blink.pairs', version = vim.version.range('0.x') },
+  'https://github.com/Saghen/blink.download',
+  { src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim', version = vim.version.range('8.x') },
+  'https://github.com/mhinz/vim-crates',
+  'https://github.com/folke/snacks.nvim',
+  { src = 'https://github.com/nvim-mini/mini.icons', version = vim.version.range('*') },
+  { src = 'https://github.com/coder/claudecode.nvim', version = vim.version.range('0.x') },
+})
 
 vim.opt.mouse = ""
 vim.opt.tabstop = 4
@@ -26,8 +54,6 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.opt.number = true
 vim.opt.termguicolors = true
 
--- Plugins
-vim.cmd [[source ~/.config/nvim/plug.vim]]
 vim.cmd [[colorscheme tokyonight-night]]
 vim.cmd [[syntax on]]
 
@@ -147,7 +173,7 @@ local on_attach = function(client, bufnr)
     for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) do
         local default_diagnostic_handler = vim.lsp.handlers[method]
         vim.lsp.handlers[method] = function(err, result, context, config)
-            if err ~= nil and err.code == -32802 then
+            if err ~= nil and err ~= vim.NIL and err.code == -32802 then
                 return
             end
             return default_diagnostic_handler(err, result, context, config)
