@@ -61,6 +61,20 @@ require"fidget".setup{
 }
 require('trouble').setup()
 
+-- Hide hint-level diagnostics (e.g. "not accessed" from Pyright)
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = {
+    severity = { min = vim.diagnostic.severity.INFO },
+  },
+  virtual_text = {
+    severity = { min = vim.diagnostic.severity.INFO },
+  },
+  underline = {
+    severity = { min = vim.diagnostic.severity.INFO },
+  },
+})
+
 require('render-markdown').setup {
   file_types = { "markdown" },
   latex = { enabled = false }
@@ -173,6 +187,16 @@ vim.g.rustaceanvim = {
   },
 }
 
+-- Toggle crates for Cargo.toml
+if vim.fn.has('nvim') == 1 then
+  vim.api.nvim_create_autocmd({"BufRead"}, {
+    pattern = {"Cargo.toml"},
+    callback = function()
+      vim.fn['crates#toggle']()
+    end
+  })
+end
+
 local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
 
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -247,6 +271,10 @@ require('telescope').setup{
             "--smart-case",
         }
     },
+}
+
+require('snacks').setup {
+    input = { enabled = true },
 }
 
 require("inc_rename").setup {
@@ -339,30 +367,24 @@ lualine.setup {
 vim.lsp.config('sourcekit', {
     capabilities = capabilities
 })
+
 vim.lsp.enable('sourcekit')
 
--- Python
-vim.lsp.config("ruff", {
-  capabilities = capabilities,
-  settings = {
-    -- Ruff language server settings go here
-  },
-  on_attach = function(client, bufnr)
-    -- Let Ruff handle formatting
-    client.server_capabilities.documentFormattingProvider = true
-
-    -- Format on save
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      callback = function()
-        vim.lsp.buf.format({ bufnr = bufnr })
-      end,
+vim.api.nvim_create_autocmd({"FileType"}, {
+  pattern = {"swift"},
+  callback = function()
+    vim.api.nvim_create_autocmd({"BufWritePost"}, {
+      pattern = {"*.swift"},
+      command = "silent !swiftformat %"
     })
-  end,
+  end
 })
+
+-- Python
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client == nil then
@@ -376,45 +398,48 @@ vim.api.nvim_create_autocmd("LspAttach", {
   desc = 'LSP: Disable hover capability from Ruff',
 })
 
-
 vim.lsp.config('pyright', {
+  capabilities = capabilities,
+  root_markers = { '.git' },
   settings = {
     pyright = {
-      -- Using Ruff's import organizer
       disableOrganizeImports = true,
     },
     python = {
       analysis = {
-        -- Ignore all files for analysis to exclusively use Ruff for linting
-        ignore = { '*' },
+        autoImportCompletions = true,
+        diagnosticMode = 'workspace',
       },
     },
   },
-  capabilities = capabilities
+})
+
+vim.lsp.enable('pyright')
+
+vim.lsp.config("ruff", {
+  capabilities = capabilities,
+  settings = {
+      -- Ruff language server settings go here
+  },
+  on_attach = function(client, bufnr)
+    -- Let Ruff handle formatting
+    client.server_capabilities.documentFormattingProvider = true
+
+    -- Apply autofixes and format on save
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.code_action({
+          context = { only = { "source.fixAll.ruff" }, diagnostics = {} },
+          apply = true,
+        })
+        vim.lsp.buf.format({ bufnr = bufnr })
+      end,
+    })
+  end,
 })
 
 vim.lsp.enable('ruff')
-vim.lsp.enable('pyright')
-
-vim.api.nvim_create_autocmd({"FileType"}, {
-  pattern = {"swift"},
-  callback = function()
-    vim.api.nvim_create_autocmd({"BufWritePost"}, {
-      pattern = {"*.swift"},
-      command = "silent !swiftformat %"
-    })
-  end
-})
-
--- Toggle crates for Cargo.toml
-if vim.fn.has('nvim') == 1 then
-  vim.api.nvim_create_autocmd({"BufRead"}, {
-    pattern = {"Cargo.toml"},
-    callback = function()
-      vim.fn['crates#toggle']()
-    end
-  })
-end
 
 -- Claude Code
 require('claudecode').setup({
