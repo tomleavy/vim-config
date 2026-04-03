@@ -427,6 +427,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 vim.lsp.config('pyright', {
   capabilities = capabilities,
   root_markers = { '.git' },
+  init_options = {
+    disablePullDiagnostics = true,
+  },
   settings = {
     pyright = {
       disableOrganizeImports = true,

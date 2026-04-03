@@ -98,6 +98,10 @@
     "vim-repeat": {
       "rev": "65846025c15494983dafe5e3b46c8f88ab2e9635",
       "src": "https://github.com/tpope/vim-repeat"
+    },
+    "workspace-diagnostics.nvim": {
+      "rev": "60f9175b2501ae3f8b1aba9719c0df8827610c8e",
+      "src": "https://github.com/artemave/workspace-diagnostics.nvim"
     }
   }
 }
