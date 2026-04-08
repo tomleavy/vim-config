@@ -87,18 +87,8 @@ require"fidget".setup{
 }
 require('trouble').setup()
 
--- Hide hint-level diagnostics (e.g. "not accessed" from Pyright)
 vim.diagnostic.config({
   severity_sort = true,
-  signs = {
-    severity = { min = vim.diagnostic.severity.INFO },
-  },
-  virtual_text = {
-    severity = { min = vim.diagnostic.severity.INFO },
-  },
-  underline = {
-    severity = { min = vim.diagnostic.severity.INFO },
-  },
 })
 
 require('render-markdown').setup {
@@ -109,7 +99,7 @@ require('render-markdown').setup {
 vim.keymap.set('n', '<C-]>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-[>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<esc>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'gt', ':Trouble diagnostics toggle filter.severity={vim.diagnostic.severity.ERROR,vim.diagnostic.severity.WARN,vim.diagnostic.severity.INFO}<CR>', { noremap = true, silent = true })
 
 -- views can only be fully collapsed with the global statusline
 vim.opt.laststatus = 3
